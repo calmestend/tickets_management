@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Nueva Queja o Sugerencia - UTC</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: linear-gradient(135deg, #f0f9ff 0%, #c6f6d5 100%);
+			min-height: 100vh;
+			color: #1a202c;
+			padding: 20px;
+		}
+
+		.cancel-btn {
+			background: #e2e8f0;
+			color: #666;
+		}
+
+		button:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+		}
+
+		.header {
+			background: white;
+			padding: 15px 30px;
+			border-radius: 12px;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 30px;
+		}
+
+		.logo {
+			height: 50px;
+		}
+
+		.user-info {
+			display: flex;
+			align-items: center;
+			gap: 15px;
+			color: #2d3748;
+			font-weight: 500;
+		}
+
+		.avatar {
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			background: linear-gradient(135deg, #38a169 0%, #68d391 100%);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			font-size: 16px;
+			font-weight: bold;
+		}
+
+		.container {
+			max-width: 700px;
+			margin: 0 auto;
+			background: white;
+			border-radius: 15px;
+			box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
+			overflow: hidden;
+		}
+
+		.form-header {
+			background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
+			color: white;
+			padding: 30px;
+			text-align: center;
+		}
+
+		.form-header h1 {
+			font-size: 28px;
+			margin-bottom: 10px;
+			font-weight: 300;
+		}
+
+		.form-header p {
+			opacity: 0.9;
+			font-size: 16px;
+		}
+
+		.form-content {
+			padding: 40px;
+		}
+
+		.form-section {
+			margin-bottom: 30px;
+			padding: 25px;
+			border: 1px solid #e2e8f0;
+			border-radius: 12px;
+			background: #f7fafc;
+		}
+
+		.section-title {
+			color: #2d3748;
+			font-size: 18px;
+			font-weight: 600;
+			margin-bottom: 20px;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.form-group {
+			margin-bottom: 20px;
+		}
+
+		.form-row {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 20px;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 8px;
+			color: #2d3748;
+			font-weight: 600;
+			font-size: 14px;
+		}
+
+		.required {
+			color: #e53e3e;
+		}
+
+		input[type="text"],
+		input[type="email"],
+		input[type="date"],
+		select,
+		textarea {
+			width: 100%;
+			padding: 12px 15px;
+			border: 2px solid #e2e8f0;
+			border-radius: 8px;
+			font-size: 14px;
+			font-family: inherit;
+			transition: all 0.3s ease;
+			background: white;
+		}
+
+		input:focus,
+		select:focus,
+		textarea:focus {
+			outline: none;
+			border-color: #38a169;
+			box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.1);
+		}
+
+		textarea {
+			resize: vertical;
+			min-height: 120px;
+			line-height: 1.5;
+		}
+
+		.description-area {
+			background: #f0fff4;
+			border: 2px solid #38a169;
+			min-height: 150px;
+		}
+
+		.priority-select,
+		.category-select {
+			background: #f0fff4;
+			border: 2px solid #38a169;
+		}
+
+		.char-counter {
+			text-align: right;
+			font-size: 12px;
+			color: #718096;
+			margin-top: 5px;
+		}
+
+		.action-buttons {
+			display: flex;
+			gap: 15px;
+			justify-content: center;
+			margin-top: 30px;
+			flex-wrap: wrap;
+		}
+
+		.btn {
+			padding: 15px 30px;
+			border: none;
+			border-radius: 25px;
+			cursor: pointer;
+			font-size: 16px;
+			font-weight: 600;
+			transition: all 0.3s ease;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			min-width: 160px;
+			justify-content: center;
+		}
+
+		.btn-primary {
+			background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
+			color: white;
+		}
+
+		.btn-primary:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 15px rgba(56, 161, 105, 0.3);
+		}
+
+		.btn-secondary {
+			background: #e2e8f0;
+			color: #4a5568;
+		}
+
+		.btn-secondary:hover {
+			background: #cbd5e0;
+			transform: translateY(-2px);
+		}
+
+		.notification {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			padding: 15px 25px;
+			border-radius: 8px;
+			color: white;
+			font-weight: 500;
+			z-index: 1000;
+			transform: translateX(400px);
+			transition: transform 0.3s ease;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+		}
+
+		.notification.show {
+			transform: translateX(0);
+		}
+
+		.notification.success {
+			background: #38a169;
+		}
+
+		.notification.info {
+			background: #3182ce;
+		}
+
+		.help-text {
+			font-size: 12px;
+			color: #718096;
+			margin-top: 5px;
+			font-style: italic;
+		}
+
+		.file-upload {
+			position: relative;
+			display: inline-block;
+			cursor: pointer;
+			width: 100%;
+		}
+
+		.file-upload input[type="file"] {
+			position: absolute;
+			opacity: 0;
+			width: 100%;
+			height: 100%;
+			cursor: pointer;
+		}
+
+		.file-upload-label {
+			display: block;
+			padding: 12px 15px;
+			border: 2px dashed #cbd5e0;
+			border-radius: 8px;
+			text-align: center;
+			color: #718096;
+			transition: all 0.3s ease;
+		}
+
+		.file-upload:hover .file-upload-label {
+			border-color: #38a169;
+			color: #38a169;
+		}
+
+		@media (max-width: 768px) {
+			.form-row {
+				grid-template-columns: 1fr;
+			}
+
+			.action-buttons {
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.btn {
+				width: 100%;
+				max-width: 300px;
+			}
+
+			.form-content {
+				padding: 20px;
+			}
+
+			.header {
+				flex-direction: column;
+				gap: 15px;
+				text-align: center;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="form-content">
+		<form id="complaintForm">
+			<!-- Información Personal -->
+			<div class="form-section">
+				<h3 class="section-title">
+					👤 Información Personal
+				</h3>
+
+				<div class="form-row">
+					<div class="form-group">
+						<label for="studentName">Nombre Completo <span class="required">*</span></label>
+						<input type="text" id="studentName" value="Juan Pérez Díaz" readonly
+							style="background: #f7fafc; cursor: not-allowed;">
+					</div>
+					<div class="form-group">
+						<label for="studentEmail">Email Institucional <span class="required">*</span></label>
+						<input type="email" id="studentEmail" value="juan.perez@utc.edu.mx" readonly
+							style="background: #f7fafc; cursor: not-allowed;">
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-group">
+						<label for="carrera">Carrera</label>
+						<input type="text" id="carrera" value="Ingeniería en Sistemas" readonly
+							style="background: #f7fafc; cursor: not-allowed;">
+					</div>
+					<div class="form-group">
+						<label for="semestre">Semestre</label>
+						<input type="text" id="semestre" value="6to Semestre" readonly
+							style="background: #f7fafc; cursor: not-allowed;">
+					</div>
+				</div>
+			</div>
+
+			<!-- Detalles de la Queja/Sugerencia -->
+			<div class="form-section">
+				<h3 class="section-title">
+					📋 Detalles de tu Solicitud
+				</h3>
+
+				<div class="form-row">
+					<div class="form-group">
+						<label for="type">Tipo de Solicitud <span class="required">*</span></label>
+						<select id="type" class="category-select" required>
+							<option value="">Seleccionar tipo...</option>
+							<option value="queja">🔴 Queja</option>
+							<option value="sugerencia">💡 Sugerencia</option>
+							<option value="peticion">📞 Petición</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="category">Categoría <span class="required">*</span></label>
+						<select id="category" class="category-select" required>
+							<option value="">Seleccionar categoría...</option>
+							<option value="servicios-academicos">📚 Servicios Académicos</option>
+							<option value="infraestructura">🏢 Infraestructura</option>
+							<option value="servicios-estudiantiles">🎓 Servicios Estudiantiles</option>
+							<option value="tecnologia">💻 Tecnología</option>
+							<option value="administrativo">📄 Administrativo</option>
+							<option value="biblioteca">📖 Biblioteca</option>
+							<option value="cafeteria">🍽️ Cafetería</option>
+							<option value="otro">🔧 Otro</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-group">
+						<label for="priority">Prioridad <span class="required">*</span></label>
+						<select id="priority" class="priority-select" required>
+							<option value="">Seleccionar prioridad...</option>
+							<option value="alta">🔴 Alta - Urgente</option>
+							<option value="media">🟡 Media - Importante</option>
+							<option value="baja">🟢 Baja - Cuando sea posible</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="complaintDate">Fecha del Incidente</label>
+						<input type="date" id="complaintDate">
+						<div class="help-text">Opcional: Fecha en que ocurrió el problema</div>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="subject">Asunto <span class="required">*</span></label>
+					<input type="text" id="subject" placeholder="Resumen breve de tu solicitud" maxlength="100" required>
+					<div class="char-counter">
+						<span id="subjectCounter">0</span>/100 caracteres
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="description">Descripción Detallada <span class="required">*</span></label>
+					<textarea id="description" class="description-area"
+						placeholder="Describe detalladamente tu queja, sugerencia o petición. Incluye todos los detalles relevantes..."
+						maxlength="1000" required></textarea>
+					<div class="char-counter">
+						<span id="descriptionCounter">0</span>/1000 caracteres
+					</div>
+					<div class="help-text">Sé específico: ¿qué pasó?, ¿cuándo?, ¿dónde?, ¿quién estuvo involucrado?</div>
+				</div>
+			</div>
+
+			<div class="action-buttons">
+				<button type="button" class="cancel-btn btn" onclick="history.back()">Cancelar</button>
+				<button type="submit" class="btn btn-primary">
+					📤 Enviar Solicitud
+				</button>
+			</div>
+		</form>
+	</div>
+	</div>
+
+	<div id="notification" class="notification"></div>
+
+	<script>
+		// Contadores de caracteres
+		function setupCharCounters() {
+			const fields = [
+				{input: 'subject', counter: 'subjectCounter', max: 100},
+				{input: 'description', counter: 'descriptionCounter', max: 1000},
+				{input: 'expectedResolution', counter: 'resolutionCounter', max: 500}
+			];
+
+			fields.forEach(field => {
+				const input = document.getElementById(field.input);
+				const counter = document.getElementById(field.counter);
+
+				input.addEventListener('input', function () {
+					const count = this.value.length;
+					counter.textContent = count;
+
+					if (count > field.max * 0.9) {
+						counter.style.color = '#e53e3e';
+					} else {
+						counter.style.color = '#718096';
+					}
+				});
+			});
+		}
+
+		// Manejar archivos adjuntos
+		document.getElementById('attachments').addEventListener('change', function () {
+			const label = this.nextElementSibling;
+			const fileCount = this.files.length;
+
+			if (fileCount > 0) {
+				label.innerHTML = `📎 ${fileCount} archivo(s) seleccionado(s)<br><small>Haz clic para cambiar</small>`;
+				label.style.borderColor = '#38a169';
+				label.style.color = '#38a169';
+			} else {
+				label.innerHTML = '📎 Haz clic para adjuntar archivos (opcional)<br><small>Formatos: PDF, JPG, PNG, DOC, DOCX - Máx. 5MB por archivo</small>';
+				label.style.borderColor = '#cbd5e0';
+				label.style.color = '#718096';
+			}
+		});
+
+		// Función para mostrar notificaciones
+		function showNotification(message, type = 'success') {
+			const notification = document.getElementById('notification');
+			notification.textContent = message;
+			notification.className = `notification ${type} show`;
+
+			setTimeout(() => {
+				notification.classList.remove('show');
+			}, 4000);
+		}
+
+		// Manejar envío del formulario
+		document.getElementById('complaintForm').addEventListener('submit', function (e) {
+			e.preventDefault();
+
+			// Validar campos requeridos
+			const requiredFields = ['type', 'category', 'priority', 'subject', 'description'];
+			let isValid = true;
+
+			requiredFields.forEach(fieldId => {
+				const field = document.getElementById(fieldId);
+				if (!field.value.trim()) {
+					field.style.borderColor = '#e53e3e';
+					isValid = false;
+				} else {
+					field.style.borderColor = '#e2e8f0';
+				}
+			});
+
+			if (isValid) {
+				showNotification('¡Solicitud enviada correctamente! Te contactaremos pronto.', 'success');
+				// Aquí iría la lógica para enviar los datos al servidor
+				setTimeout(() => {
+					// Simular redirección o limpieza del formulario
+					this.reset();
+					setupCharCounters();
+				}, 2000);
+			} else {
+				showNotification('Por favor completa todos los campos requeridos', 'error');
+			}
+		});
+
+		// Inicializar contadores al cargar la página
+		document.addEventListener('DOMContentLoaded', function () {
+			setupCharCounters();
+		});
+	</Script>
+</body>
+
+</html>

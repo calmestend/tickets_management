@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<title>Auth</title>
+	<style>
+		body {
+			background: linear-gradient(120deg, #0FB59F, #0B8BBC, #F2F2F2, #17A67D);
+			background-size: 400% 400%;
+			animation: gradientBG 12s ease-in-out infinite;
+			font-family: Arial, sans-serif;
+			margin: 0;
+			color: #222;
+		}
+
+		@keyframes gradientBG {
+
+			0%,
+			800% {
+				background-position: 0% 100%
+			}
+
+			400% {
+				background-position: 7500% 30%
+			}
+		}
+
+		.logo-container {
+			display: flex;
+			justify-content: center;
+			margin: 40px 0 -30px;
+		}
+
+		.logo-container img {
+			width: 120px;
+			height: 110px;
+			border-radius: 12px;
+			box-shadow: 0 2px 8px #0B8BBC33;
+			background: #fff;
+			padding: 8px;
+			border: 2px solid #0FB59F;
+		}
+
+		.panel {
+			max-width: 340px;
+			margin: 60px auto;
+			background: linear-gradient(120deg, #f8fafc 80%, #e0f7fa 100%);
+			border-radius: 16px;
+			box-shadow: 0 6px 24px #0002;
+			padding: 32px 28px 20px;
+			border: 2px solid #0B8BBC;
+			text-align: center;
+			position: relative;
+		}
+
+		h2 {
+			color: #17A67D;
+			margin: 10px 0 20px;
+			font-size: 24px;
+			font-weight: 700;
+			letter-spacing: 1px;
+			text-shadow: 1px 1px 0 #0FB59F33;
+		}
+
+		.decoration {
+			height: 4px;
+			background: linear-gradient(90deg, #0B8BBC, #0F8A68, #0FB59F);
+			border-radius: 2px;
+			margin-bottom: 18px;
+		}
+
+		input,
+		button {
+			width: 100%;
+			padding: 12px;
+			margin: 10px 0;
+			border-radius: 7px;
+			font-size: 15px;
+			box-sizing: border-box;
+			border: 1.5px solid #0FB59F;
+			outline: none;
+			transition: box-shadow .2s, border-color .2s;
+		}
+
+		input {
+			background: #e0f7fa;
+			color: #0B8BBC;
+		}
+
+		input:focus {
+			box-shadow: 0 0 0 2px #17A67D44;
+			border-color: #17A67D;
+			background: #fff;
+		}
+
+		button[type="submit"] {
+			background: linear-gradient(90deg, #17A67D, #0B8BBC);
+			color: #fff;
+			border: none;
+			font-weight: 600;
+			margin-top: 14px;
+			cursor: pointer;
+			transition: background .4s, color .2s;
+			box-shadow: 0 2px 8px #0B8BBC33;
+			letter-spacing: 1px;
+		}
+
+		button[type="submit"]:hover {
+			background: #0F8A68;
+			color: #FFD700;
+		}
+
+		.toggle {
+			background: none;
+			color: #0F8A68;
+			border: none;
+			cursor: pointer;
+			text-decoration: underline;
+			font-size: 14px;
+			margin-top: 8px;
+			padding: 8px 0 0;
+			transition: color .2s;
+		}
+
+		.toggle:hover {
+			color: #0B8BBC;
+		}
+
+		input::placeholder {
+			color: #0B8BBC99;
+			opacity: 1;
+		}
+
+		.panel:hover {
+			box-shadow: 0 8px 32px #0FB59F33;
+			border-color: #17A67D;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="logo-container">
+		<img
+			src="https://imgs.search.brave.com/6UqI_wisZKzgwoye0pTp0QUoyrtCN3zs4PDPRvQcE2o/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly91dGMt/bWF4Lm14L3N0YXRp/Yy9pbWdzL2xvZ29z/L2xvZ29fdXRjLnBu/Zw"
+			alt="UTC">
+	</div>
+	<div class="panel">
+		<div class="decoration"></div>
+		<h2 id="panel-title">Iniciar Sesión</h2>
+		<form id="login-form">
+			<input type="text" placeholder="Usuario o Email" required>
+			<input type="password" placeholder="Contraseña" required>
+			<button type="submit">Entrar</button>
+		</form>
+		<form id="register-form" style="display:none">
+			<input type="text" placeholder="Usuario" required>
+			<input type="email" placeholder="Email" required>
+			<input type="password" placeholder="Contraseña" required>
+			<button type="submit">Registrarse</button>
+		</form>
+		<button class="toggle" onclick="togglePanel()">¿No tienes cuenta? Regístrate</button>
+	</div>
+</body>
+<script>
+	function togglePanel() {
+		const loginForm = document.getElementById('login-form');
+		const registerForm = document.getElementById('register-form');
+		const panelTitle = document.getElementById('panel-title');
+		const toggleBtn = document.querySelector('.toggle');
+
+		const isLoginVisible = loginForm.style.display !== 'none';
+
+		if (isLoginVisible) {
+			loginForm.style.display = 'none';
+			registerForm.style.display = 'block';
+			panelTitle.textContent = 'Registrarse';
+			toggleBtn.textContent = '¿Ya tienes cuenta? Inicia sesión';
+		} else {
+			loginForm.style.display = 'block';
+			registerForm.style.display = 'none';
+			panelTitle.textContent = 'Iniciar Sesión';
+			toggleBtn.textContent = '¿No tienes cuenta? Regístrate';
+		}
+	}
+</script>
+
+</html>
