@@ -127,55 +127,53 @@
 		<h1>✏️ Editar Mi Perfil</h1>
 
 		<div class="avatar-section">
-			<div class="avatar">JD</div>
+			<div class="avatar">{{ user.initials }}</div>
 			<p style="color: #666; font-size: 14px;">Avatar actual</p>
 		</div>
 
-		<form>
+		<form id="profile-form">
 			<div class="form-group">
 				<label>Nombre Completo</label>
-				<input type="text" value="Juan Pérez Díaz" required>
+				<input type="text" name="name" id="name" value="{{ user.name }}" required>
+			</div>
+
+			<div class="form-group">
+				<label>Apellido</label>
+				<input type="text" name="last_name" id="last_name" value="{{ user.last_name }}" required>
 			</div>
 
 			<div class="form-group">
 				<label>Email</label>
-				<input type="email" value="juan.perez@utc.edu.mx" required>
+				<input type="email" name="email" id="email" value="{{ user.email }}" required>
 			</div>
 
 			<div class="form-group">
-				<label>Area</label>
-				<select>
-					<option>Ingeniería en Sistemas</option>
-					<option>Ingeniería Industrial</option>
-					<option>Administración</option>
-					<option>Contabilidad</option>
+				<label>Área</label>
+				<select name="study_area" id="study_area">
+					<option {% if user.study_area=='Ingeniería en Sistemas' %}selected{% endif %}>Ingeniería en Sistemas</option>
+					<option {% if user.study_area=='Ingeniería Industrial' %}selected{% endif %}>Ingeniería Industrial</option>
+					<option {% if user.study_area=='Administración' %}selected{% endif %}>Administración</option>
+					<option {% if user.study_area=='Contabilidad' %}selected{% endif %}>Contabilidad</option>
 				</select>
 			</div>
 
 			<div class="form-group">
 				<label>Semestre</label>
-				<select>
-					<option>1er Semestre</option>
-					<option>2do Semestre</option>
-					<option>3er Semestre</option>
-					<option>4to Semestre</option>
-					<option>5to Semestre</option>
-					<option selected>6to Semestre</option>
-					<option>7mo Semestre</option>
-					<option>8vo Semestre</option>
-					<option>9no Semestre</option>
+				<select name="term" id="term">
+					{% for i in range(1, 10) %}
+					<option value="{{ i }}" {% if user.term==i %}selected{% endif %}>{{ i }}° Semestre</option>
+					{% endfor %}
 				</select>
 			</div>
 
 			<div class="form-group">
 				<label>Especialidad</label>
-				<input type="text" value="Desarrollo Web">
+				<input type="text" name="study_speciality" id="study_speciality" value="{{ user.study_speciality }}">
 			</div>
 
 			<div class="form-group">
 				<label>Descripción Personal</label>
-				<textarea placeholder="Cuéntanos un poco sobre ti...">Estudiante apasionado por la tecnología y el desarrollo de
-					software.</textarea>
+				<textarea name="personal_description" id="personal_description">{{ user.personal_description }}</textarea>
 			</div>
 
 			<div class="buttons">
@@ -183,14 +181,46 @@
 				<button type="submit" class="save-btn">💾 Guardar Cambios</button>
 			</div>
 		</form>
+
 	</div>
 
 	<script>
-		document.querySelector('form').addEventListener('submit', function (e) {
+		document.getElementById('profile-form').addEventListener('submit', async function (e) {
 			e.preventDefault();
-			alert('¡Perfil actualizado correctamente! ✅');
+
+			const data = {
+				name: document.getElementById('name').value.trim(),
+				last_name: document.getElementById('last_name').value.trim(),
+				email: document.getElementById('email').value.trim(),
+				study_area: document.getElementById('study_area').value,
+				study_speciality: document.getElementById('study_speciality').value.trim(),
+				term: parseInt(document.getElementById('term').value),
+				personal_description: document.getElementById('personal_description').value.trim()
+			};
+
+			try {
+				const res = await fetch('/profile', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(data)
+				});
+				const result = await res.json();
+
+				if (result.success) {
+					alert(result.message);
+					location.reload();
+				} else {
+					alert('Error: ' + result.message);
+				}
+			} catch (err) {
+				console.error(err);
+				alert('Error al enviar datos');
+			}
 		});
 	</script>
+
 </body>
 
 </html>

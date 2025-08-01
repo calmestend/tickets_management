@@ -20,16 +20,6 @@
 			padding: 20px;
 		}
 
-		.cancel-btn {
-			background: #e2e8f0;
-			color: #666;
-		}
-
-		button:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-		}
-
 		.header {
 			background: white;
 			padding: 15px 30px;
@@ -41,29 +31,23 @@
 			margin-bottom: 30px;
 		}
 
-		.logo {
-			height: 50px;
-		}
-
-		.user-info {
+		.nav-links {
 			display: flex;
-			align-items: center;
 			gap: 15px;
-			color: #2d3748;
-			font-weight: 500;
 		}
 
-		.avatar {
-			width: 40px;
-			height: 40px;
-			border-radius: 50%;
-			background: linear-gradient(135deg, #38a169 0%, #68d391 100%);
-			display: flex;
-			align-items: center;
-			justify-content: center;
+		.nav-links a {
+			color: #38a169;
+			text-decoration: none;
+			font-weight: 500;
+			padding: 8px 15px;
+			border-radius: 8px;
+			transition: all 0.3s ease;
+		}
+
+		.nav-links a:hover {
+			background-color: #38a169;
 			color: white;
-			font-size: 16px;
-			font-weight: bold;
 		}
 
 		.container {
@@ -213,9 +197,15 @@
 			color: white;
 		}
 
-		.btn-primary:hover {
+		.btn-primary:hover:not(:disabled) {
 			transform: translateY(-2px);
 			box-shadow: 0 4px 15px rgba(56, 161, 105, 0.3);
+		}
+
+		.btn-primary:disabled {
+			background: #cbd5e0;
+			cursor: not-allowed;
+			transform: none;
 		}
 
 		.btn-secondary {
@@ -240,6 +230,7 @@
 			transform: translateX(400px);
 			transition: transform 0.3s ease;
 			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+			max-width: 350px;
 		}
 
 		.notification.show {
@@ -248,6 +239,10 @@
 
 		.notification.success {
 			background: #38a169;
+		}
+
+		.notification.error {
+			background: #e53e3e;
 		}
 
 		.notification.info {
@@ -261,34 +256,10 @@
 			font-style: italic;
 		}
 
-		.file-upload {
-			position: relative;
-			display: inline-block;
-			cursor: pointer;
-			width: 100%;
-		}
-
-		.file-upload input[type="file"] {
-			position: absolute;
-			opacity: 0;
-			width: 100%;
-			height: 100%;
-			cursor: pointer;
-		}
-
-		.file-upload-label {
-			display: block;
-			padding: 12px 15px;
-			border: 2px dashed #cbd5e0;
-			border-radius: 8px;
-			text-align: center;
-			color: #718096;
-			transition: all 0.3s ease;
-		}
-
-		.file-upload:hover .file-upload-label {
-			border-color: #38a169;
-			color: #38a169;
+		.readonly-field {
+			background: #f7fafc !important;
+			cursor: not-allowed !important;
+			color: #4a5568;
 		}
 
 		@media (max-width: 768px) {
@@ -320,118 +291,123 @@
 </head>
 
 <body>
-	<div class="form-content">
-		<form id="complaintForm">
-			<!-- Información Personal -->
-			<div class="form-section">
-				<h3 class="section-title">
-					👤 Información Personal
-				</h3>
+	<div class="container">
+		<div class="form-header">
+			<h1>Nueva Queja o Sugerencia</h1>
+			<p>Tu opinión es importante para mejorar nuestra universidad</p>
+		</div>
 
-				<div class="form-row">
-					<div class="form-group">
-						<label for="studentName">Nombre Completo <span class="required">*</span></label>
-						<input type="text" id="studentName" value="Juan Pérez Díaz" readonly
-							style="background: #f7fafc; cursor: not-allowed;">
+		<div class="form-content">
+			<form id="complaintForm">
+				<!-- Información Personal -->
+				<div class="form-section">
+					<h3 class="section-title">
+						👤 Información Personal
+					</h3>
+
+					<div class="form-row">
+						<div class="form-group">
+							<label for="studentName">Nombre Completo <span class="required">*</span></label>
+							<input type="text" id="studentName" value="{{ user.full_name }}" readonly class="readonly-field">
+						</div>
+						<div class="form-group">
+							<label for="studentEmail">Email Institucional <span class="required">*</span></label>
+							<input type="email" id="studentEmail" value="{{ user.email }}" readonly class="readonly-field">
+						</div>
 					</div>
-					<div class="form-group">
-						<label for="studentEmail">Email Institucional <span class="required">*</span></label>
-						<input type="email" id="studentEmail" value="juan.perez@utc.edu.mx" readonly
-							style="background: #f7fafc; cursor: not-allowed;">
+
+					<div class="form-row">
+						<div class="form-group">
+							<label for="carrera">Carrera</label>
+							<input type="text" id="carrera" value="{{ user.study_area }}" readonly class="readonly-field">
+						</div>
+						<div class="form-group">
+							<label for="semestre">Semestre</label>
+							<input type="text" id="semestre" value="{{ user.term }}º Semestre" readonly class="readonly-field">
+						</div>
 					</div>
 				</div>
 
-				<div class="form-row">
-					<div class="form-group">
-						<label for="carrera">Carrera</label>
-						<input type="text" id="carrera" value="Ingeniería en Sistemas" readonly
-							style="background: #f7fafc; cursor: not-allowed;">
+				<!-- Detalles de la Queja/Sugerencia -->
+				<div class="form-section">
+					<h3 class="section-title">
+						📋 Detalles de tu Solicitud
+					</h3>
+
+					<div class="form-row">
+						<div class="form-group">
+							<label for="type">Tipo de Solicitud <span class="required">*</span></label>
+							<select id="type" name="type" class="category-select" required>
+								<option value="">Seleccionar tipo...</option>
+								<option value="queja">🔴 Queja</option>
+								<option value="sugerencia">💡 Sugerencia</option>
+								<option value="peticion">📞 Petición</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="category">Categoría <span class="required">*</span></label>
+							<select id="category" name="category" class="category-select" required>
+								<option value="">Seleccionar categoría...</option>
+								<option value="servicios-academicos">📚 Servicios Académicos</option>
+								<option value="infraestructura">🏢 Infraestructura</option>
+								<option value="servicios-estudiantiles">🎓 Servicios Estudiantiles</option>
+								<option value="tecnologia">💻 Tecnología</option>
+								<option value="administrativo">📄 Administrativo</option>
+								<option value="biblioteca">📖 Biblioteca</option>
+								<option value="cafeteria">🍽️ Cafetería</option>
+								<option value="otro">🔧 Otro</option>
+							</select>
+						</div>
 					</div>
+
+					<div class="form-row">
+						<div class="form-group">
+							<label for="priority">Prioridad <span class="required">*</span></label>
+							<select id="priority" name="priority" class="priority-select" required>
+								<option value="">Seleccionar prioridad...</option>
+								<option value="alta">🔴 Alta - Urgente</option>
+								<option value="media">🟡 Media - Importante</option>
+								<option value="baja">🟢 Baja - Cuando sea posible</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="incident_date">Fecha del Incidente</label>
+							<input type="date" id="incident_date" name="incident_date">
+							<div class="help-text">Opcional: Fecha en que ocurrió el problema</div>
+						</div>
+					</div>
+
 					<div class="form-group">
-						<label for="semestre">Semestre</label>
-						<input type="text" id="semestre" value="6to Semestre" readonly
-							style="background: #f7fafc; cursor: not-allowed;">
+						<label for="subject">Asunto <span class="required">*</span></label>
+						<input type="text" id="subject" name="subject" placeholder="Resumen breve de tu solicitud" maxlength="100"
+							required>
+						<div class="char-counter">
+							<span id="subjectCounter">0</span>/100 caracteres
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="description">Descripción Detallada <span class="required">*</span></label>
+						<textarea id="description" name="description" class="description-area"
+							placeholder="Describe detalladamente tu queja, sugerencia o petición. Incluye todos los detalles relevantes..."
+							maxlength="1000" required></textarea>
+						<div class="char-counter">
+							<span id="descriptionCounter">0</span>/1000 caracteres
+						</div>
+						<div class="help-text">Sé específico: ¿qué pasó?, ¿cuándo?, ¿dónde?, ¿quién estuvo involucrado?</div>
 					</div>
 				</div>
-			</div>
 
-			<!-- Detalles de la Queja/Sugerencia -->
-			<div class="form-section">
-				<h3 class="section-title">
-					📋 Detalles de tu Solicitud
-				</h3>
-
-				<div class="form-row">
-					<div class="form-group">
-						<label for="type">Tipo de Solicitud <span class="required">*</span></label>
-						<select id="type" class="category-select" required>
-							<option value="">Seleccionar tipo...</option>
-							<option value="queja">🔴 Queja</option>
-							<option value="sugerencia">💡 Sugerencia</option>
-							<option value="peticion">📞 Petición</option>
-						</select>
-					</div>
-					<div class="form-group">
-						<label for="category">Categoría <span class="required">*</span></label>
-						<select id="category" class="category-select" required>
-							<option value="">Seleccionar categoría...</option>
-							<option value="servicios-academicos">📚 Servicios Académicos</option>
-							<option value="infraestructura">🏢 Infraestructura</option>
-							<option value="servicios-estudiantiles">🎓 Servicios Estudiantiles</option>
-							<option value="tecnologia">💻 Tecnología</option>
-							<option value="administrativo">📄 Administrativo</option>
-							<option value="biblioteca">📖 Biblioteca</option>
-							<option value="cafeteria">🍽️ Cafetería</option>
-							<option value="otro">🔧 Otro</option>
-						</select>
-					</div>
+				<div class="action-buttons">
+					<button type="button" class="btn btn-secondary" onclick="window.history.back()">
+						↪️ Cancelar
+					</button>
+					<button type="submit" class="btn btn-primary" id="submitBtn">
+						📤 Enviar Solicitud
+					</button>
 				</div>
-
-				<div class="form-row">
-					<div class="form-group">
-						<label for="priority">Prioridad <span class="required">*</span></label>
-						<select id="priority" class="priority-select" required>
-							<option value="">Seleccionar prioridad...</option>
-							<option value="alta">🔴 Alta - Urgente</option>
-							<option value="media">🟡 Media - Importante</option>
-							<option value="baja">🟢 Baja - Cuando sea posible</option>
-						</select>
-					</div>
-					<div class="form-group">
-						<label for="complaintDate">Fecha del Incidente</label>
-						<input type="date" id="complaintDate">
-						<div class="help-text">Opcional: Fecha en que ocurrió el problema</div>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label for="subject">Asunto <span class="required">*</span></label>
-					<input type="text" id="subject" placeholder="Resumen breve de tu solicitud" maxlength="100" required>
-					<div class="char-counter">
-						<span id="subjectCounter">0</span>/100 caracteres
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label for="description">Descripción Detallada <span class="required">*</span></label>
-					<textarea id="description" class="description-area"
-						placeholder="Describe detalladamente tu queja, sugerencia o petición. Incluye todos los detalles relevantes..."
-						maxlength="1000" required></textarea>
-					<div class="char-counter">
-						<span id="descriptionCounter">0</span>/1000 caracteres
-					</div>
-					<div class="help-text">Sé específico: ¿qué pasó?, ¿cuándo?, ¿dónde?, ¿quién estuvo involucrado?</div>
-				</div>
-			</div>
-
-			<div class="action-buttons">
-				<button type="button" class="cancel-btn btn" onclick="history.back()">Cancelar</button>
-				<button type="submit" class="btn btn-primary">
-					📤 Enviar Solicitud
-				</button>
-			</div>
-		</form>
-	</div>
+			</form>
+		</div>
 	</div>
 
 	<div id="notification" class="notification"></div>
@@ -441,42 +417,27 @@
 		function setupCharCounters() {
 			const fields = [
 				{input: 'subject', counter: 'subjectCounter', max: 100},
-				{input: 'description', counter: 'descriptionCounter', max: 1000},
-				{input: 'expectedResolution', counter: 'resolutionCounter', max: 500}
+				{input: 'description', counter: 'descriptionCounter', max: 1000}
 			];
 
 			fields.forEach(field => {
 				const input = document.getElementById(field.input);
 				const counter = document.getElementById(field.counter);
 
-				input.addEventListener('input', function () {
-					const count = this.value.length;
-					counter.textContent = count;
+				if (input && counter) {
+					input.addEventListener('input', function () {
+						const count = this.value.length;
+						counter.textContent = count;
 
-					if (count > field.max * 0.9) {
-						counter.style.color = '#e53e3e';
-					} else {
-						counter.style.color = '#718096';
-					}
-				});
+						if (count > field.max * 0.9) {
+							counter.style.color = '#e53e3e';
+						} else {
+							counter.style.color = '#718096';
+						}
+					});
+				}
 			});
 		}
-
-		// Manejar archivos adjuntos
-		document.getElementById('attachments').addEventListener('change', function () {
-			const label = this.nextElementSibling;
-			const fileCount = this.files.length;
-
-			if (fileCount > 0) {
-				label.innerHTML = `📎 ${fileCount} archivo(s) seleccionado(s)<br><small>Haz clic para cambiar</small>`;
-				label.style.borderColor = '#38a169';
-				label.style.color = '#38a169';
-			} else {
-				label.innerHTML = '📎 Haz clic para adjuntar archivos (opcional)<br><small>Formatos: PDF, JPG, PNG, DOC, DOCX - Máx. 5MB por archivo</small>';
-				label.style.borderColor = '#cbd5e0';
-				label.style.color = '#718096';
-			}
-		});
 
 		// Función para mostrar notificaciones
 		function showNotification(message, type = 'success') {
@@ -486,20 +447,37 @@
 
 			setTimeout(() => {
 				notification.classList.remove('show');
-			}, 4000);
+			}, 5000);
 		}
 
 		// Manejar envío del formulario
-		document.getElementById('complaintForm').addEventListener('submit', function (e) {
+		document.getElementById('complaintForm').addEventListener('submit', async function (e) {
 			e.preventDefault();
+
+			const submitBtn = document.getElementById('submitBtn');
+
+			// Deshabilitar botón
+			submitBtn.disabled = true;
+			submitBtn.innerHTML = '⏳ Enviando...';
+
+			// Obtener datos del formulario
+			const formData = new FormData(this);
+			const complaintData = {
+				type: formData.get('type'),
+				category: formData.get('category'),
+				priority: formData.get('priority'),
+				subject: formData.get('subject'),
+				description: formData.get('description'),
+				incident_date: formData.get('incident_date')
+			};
 
 			// Validar campos requeridos
 			const requiredFields = ['type', 'category', 'priority', 'subject', 'description'];
 			let isValid = true;
 
-			requiredFields.forEach(fieldId => {
-				const field = document.getElementById(fieldId);
-				if (!field.value.trim()) {
+			requiredFields.forEach(fieldName => {
+				const field = document.getElementById(fieldName);
+				if (!complaintData[fieldName] || !complaintData[fieldName].trim()) {
 					field.style.borderColor = '#e53e3e';
 					isValid = false;
 				} else {
@@ -507,24 +485,57 @@
 				}
 			});
 
-			if (isValid) {
-				showNotification('¡Solicitud enviada correctamente! Te contactaremos pronto.', 'success');
-				// Aquí iría la lógica para enviar los datos al servidor
-				setTimeout(() => {
-					// Simular redirección o limpieza del formulario
-					this.reset();
-					setupCharCounters();
-				}, 2000);
-			} else {
+			if (!isValid) {
 				showNotification('Por favor completa todos los campos requeridos', 'error');
+				submitBtn.disabled = false;
+				submitBtn.innerHTML = '📤 Enviar Solicitud';
+				return;
 			}
+
+			try {
+				const response = await fetch('/post', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(complaintData)
+				});
+
+				const result = await response.json();
+
+				if (result.success) {
+					showNotification(result.message, 'success');
+
+					// Limpiar formulario después de un delay
+					setTimeout(() => {
+						this.reset();
+						setupCharCounters();
+						// Redirigir al inicio
+						window.location.href = '/';
+					}, 2000);
+				} else {
+					showNotification(result.message, 'error');
+					if (result.errors) {
+						result.errors.forEach(error => {
+							console.error('Error de validación:', error);
+						});
+					}
+				}
+			} catch (error) {
+				console.error('Error:', error);
+				showNotification('Error de conexión. Inténtalo de nuevo.', 'error');
+			}
+
+			// Habilitar botón nuevamente
+			submitBtn.disabled = false;
+			submitBtn.innerHTML = '📤 Enviar Solicitud';
 		});
 
 		// Inicializar contadores al cargar la página
 		document.addEventListener('DOMContentLoaded', function () {
 			setupCharCounters();
 		});
-	</Script>
+	</script>
 </body>
 
 </html>

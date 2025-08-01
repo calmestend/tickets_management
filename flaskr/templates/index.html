@@ -173,6 +173,30 @@
 			color: #721C24;
 		}
 
+		.priority-badge {
+			display: inline-block;
+			padding: 2px 8px;
+			border-radius: 12px;
+			font-size: 0.7rem;
+			font-weight: bold;
+			margin-left: 10px;
+		}
+
+		.priority-alta {
+			background-color: #ffebee;
+			color: #c62828;
+		}
+
+		.priority-media {
+			background-color: #fff3e0;
+			color: #e65100;
+		}
+
+		.priority-baja {
+			background-color: #e8f5e8;
+			color: #2e7d32;
+		}
+
 		.filter-section {
 			background-color: white;
 			padding: 15px;
@@ -234,6 +258,59 @@
 			font-size: 0.8rem;
 		}
 
+		.ticket-user {
+			font-size: 0.8rem;
+			color: #666;
+			margin-bottom: 5px;
+		}
+
+		.loading {
+			text-align: center;
+			padding: 40px;
+			color: #666;
+		}
+
+		.error {
+			text-align: center;
+			padding: 40px;
+			color: #dc3545;
+			background-color: #f8d7da;
+			border-radius: 8px;
+			margin: 20px 0;
+		}
+
+		.stats-section {
+			background-color: white;
+			padding: 15px;
+			border-radius: 8px;
+			margin-bottom: 20px;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		}
+
+		.stats-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+			gap: 15px;
+		}
+
+		.stat-item {
+			text-align: center;
+			padding: 10px;
+			background-color: var(--accent-color);
+			border-radius: 8px;
+		}
+
+		.stat-number {
+			font-size: 1.5rem;
+			font-weight: bold;
+			color: var(--primary-color);
+		}
+
+		.stat-label {
+			font-size: 0.8rem;
+			color: #666;
+		}
+
 		@media (max-width: 768px) {
 			.nav-section {
 				flex-direction: column;
@@ -262,6 +339,13 @@
 	</div>
 
 	<main class="container">
+		<div class="stats-section" id="statsSection" style="display: none;">
+			<h3>Estadísticas Generales</h3>
+			<div class="stats-grid" id="statsGrid">
+				<!-- Las estadísticas se cargarán dinámicamente -->
+			</div>
+		</div>
+
 		<div class="filter-section">
 			<h3>Filtrar por categoría:</h3>
 			<div class="filter-options">
@@ -277,7 +361,7 @@
 		</div>
 
 		<div class="ticket-container" id="ticketsContainer">
-			<div class="no-tickets">
+			<div class="loading">
 				<p>Cargando tickets...</p>
 			</div>
 		</div>
@@ -291,6 +375,7 @@
 		document.addEventListener('DOMContentLoaded', function () {
 			checkSession();
 			loadTickets();
+			loadStats();
 		});
 
 		async function checkSession() {
@@ -325,7 +410,6 @@
 
 			} catch (error) {
 				console.error('Error checking session:', error);
-				// Mostrar opciones de invitado
 				const navigation = document.getElementById('navigation');
 				navigation.innerHTML = `
 					<div style="display: flex; gap: 10px; flex-wrap: wrap; width: 100%; justify-content: center;">
@@ -336,66 +420,68 @@
 		}
 
 		async function loadTickets() {
-			try {
-				// Simulamos carga de tickets - en implementación real vendría del backend
-				const sampleTickets = [
-					{
-						id: 1,
-						category: 'cafeteria',
-						categoryName: 'Cafetería',
-						date: '2025-07-25',
-						title: 'Falta de variedad en el menú',
-						content: 'Desde hace varias semanas noto que las opciones en la cafetería principal son muy limitadas y se repiten constantemente. Sería bueno tener más variedad de alimentos saludables.',
-						status: 'en-proceso'
-					},
-					{
-						id: 2,
-						category: 'infraestructura',
-						categoryName: 'Infraestructura',
-						date: '2025-07-24',
-						title: 'Aire acondicionado en aula B-203',
-						content: 'El aire acondicionado del aula B-203 no funciona correctamente, hace mucho calor durante las clases de la tarde.',
-						status: 'pendiente'
-					},
-					{
-						id: 3,
-						category: 'servicios-academicos',
-						categoryName: 'Servicios Académicos',
-						date: '2025-07-23',
-						title: 'Problema con inscripción a materias',
-						content: 'No he podido inscribirme a las materias optativas del semestre debido a problemas técnicos en el sistema.',
-						status: 'resuelto'
-					},
-					{
-						id: 4,
-						category: 'biblioteca',
-						categoryName: 'Biblioteca',
-						date: '2025-07-22',
-						title: 'Horarios de biblioteca',
-						content: 'Sugiero extender los horarios de la biblioteca durante época de exámenes finales.',
-						status: 'pendiente'
-					},
-					{
-						id: 5,
-						category: 'tecnologia',
-						categoryName: 'Tecnología',
-						date: '2025-07-21',
-						title: 'WiFi lento en laboratorios',
-						content: 'La conexión a internet en los laboratorios de computación es muy lenta, afecta las clases prácticas.',
-						status: 'escalado'
-					}
-				];
+			const container = document.getElementById('ticketsContainer');
 
-				allTickets = sampleTickets;
-				displayTickets(allTickets);
+			try {
+				container.innerHTML = '<div class="loading"><p>Cargando tickets...</p></div>';
+
+				const response = await fetch('/api/tickets');
+				const data = await response.json();
+
+				if (data.success) {
+					allTickets = data.tickets;
+					displayTickets(allTickets);
+				} else {
+					throw new Error(data.error || 'Error desconocido');
+				}
 			} catch (error) {
 				console.error('Error loading tickets:', error);
-				document.getElementById('ticketsContainer').innerHTML = `
-					<div class="no-tickets">
-						<p>Error al cargar los tickets. Inténtalo de nuevo más tarde.</p>
+				container.innerHTML = `
+					<div class="error">
+						<p>❌ Error al cargar los tickets: ${error.message}</p>
+						<button onclick="loadTickets()" class="login-btn" style="margin-top: 10px;">Reintentar</button>
 					</div>
 				`;
 			}
+		}
+
+		async function loadStats() {
+			try {
+				const response = await fetch('/api/tickets/stats');
+				const data = await response.json();
+
+				if (data.success) {
+					displayStats(data.stats);
+				}
+			} catch (error) {
+				console.error('Error loading stats:', error);
+			}
+		}
+
+		function displayStats(stats) {
+			const statsSection = document.getElementById('statsSection');
+			const statsGrid = document.getElementById('statsGrid');
+
+			statsGrid.innerHTML = `
+				<div class="stat-item">
+					<div class="stat-number">${stats.total_tickets}</div>
+					<div class="stat-label">Total de Tickets</div>
+				</div>
+				<div class="stat-item">
+					<div class="stat-number">${stats.by_status.pendiente || 0}</div>
+					<div class="stat-label">Pendientes</div>
+				</div>
+				<div class="stat-item">
+					<div class="stat-number">${stats.by_status['en-proceso'] || 0}</div>
+					<div class="stat-label">En Proceso</div>
+				</div>
+				<div class="stat-item">
+					<div class="stat-number">${stats.by_status.resuelto || 0}</div>
+					<div class="stat-label">Resueltos</div>
+				</div>
+			`;
+
+			statsSection.style.display = 'block';
 		}
 
 		function displayTickets(tickets) {
@@ -416,15 +502,51 @@
 						<span class="ticket-category">${ticket.categoryName}</span>
 						<span class="ticket-date">${formatDate(ticket.date)}</span>
 					</div>
-					<h3 class="ticket-title">${ticket.title}</h3>
+					<div class="ticket-user">Por: ${ticket.user.name} ${ticket.user.last_name}</div>
+					<h3 class="ticket-title">
+						${ticket.title}
+						<span class="priority-badge priority-${ticket.priority}">${getPriorityText(ticket.priority)}</span>
+					</h3>
 					<p class="ticket-content">${ticket.content}</p>
+					${ticket.incident_date ? `<p class="ticket-date"><strong>Fecha del incidente:</strong> ${formatDate(ticket.incident_date)}</p>` : ''}
 					<span class="ticket-status status-${ticket.status}">${getStatusText(ticket.status)}</span>
 				</div>
 			`).join('');
 		}
 
+		async function filterTickets(category) {
+			currentFilter = category;
+			const container = document.getElementById('ticketsContainer');
+
+			try {
+				container.innerHTML = '<div class="loading"><p>Filtrando tickets...</p></div>';
+
+				let url = '/api/tickets';
+				if (category !== 'todos') {
+					url = `/api/tickets/filter/${category}`;
+				}
+
+				const response = await fetch(url);
+				const data = await response.json();
+
+				if (data.success) {
+					displayTickets(data.tickets);
+				} else {
+					throw new Error(data.error || 'Error al filtrar');
+				}
+			} catch (error) {
+				console.error('Error filtering tickets:', error);
+				container.innerHTML = `
+					<div class="error">
+						<p>❌ Error al filtrar tickets: ${error.message}</p>
+						<button onclick="filterTickets('${category}')" class="login-btn" style="margin-top: 10px;">Reintentar</button>
+					</div>
+				`;
+			}
+		}
+
 		function formatDate(dateString) {
-			const date = new Date(dateString);
+			const date = new Date(dateString + 'T00:00:00');
 			return date.toLocaleDateString('es-ES', {
 				day: '2-digit',
 				month: '2-digit',
@@ -442,15 +564,13 @@
 			return statusMap[status] || status;
 		}
 
-		function filterTickets(category) {
-			currentFilter = category;
-
-			if (category === 'todos') {
-				displayTickets(allTickets);
-			} else {
-				const filtered = allTickets.filter(ticket => ticket.category === category);
-				displayTickets(filtered);
-			}
+		function getPriorityText(priority) {
+			const priorityMap = {
+				'alta': 'Alta',
+				'media': 'Media',
+				'baja': 'Baja'
+			};
+			return priorityMap[priority] || priority;
 		}
 
 		// Event listeners para filtros

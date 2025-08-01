@@ -109,21 +109,553 @@ def logout():
     flash("Sesión cerrada exitosamente", "info")
     return redirect(url_for("auth"))
 
-@app.route("/profile")
+# ====== NUEVOS ENDPOINTS PARA MANEJO DINÁMICO DE TICKETS ======
+
+@app.route('/api/tickets')
+def get_tickets():
+    """Endpoint para obtener todos los tickets dinámicamente"""
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'error': 'Error de conexión a la base de datos'}), 500
+    
+    try:
+        cur = conn.cursor()
+        
+        # Query para obtener tickets con información del usuario
+        query = """
+            SELECT 
+                c.id,
+                c.complaint_type,
+                c.category,
+                c.priority,
+                c.subject,
+                c.description,
+                c.incident_date,
+                c.status,
+                c.created_at,
+                u.name,
+                u.last_name,
+                u.avatar_initials
+            FROM complaints c
+            INNER JOIN users u ON c.user_id = u.id
+            WHERE u.is_active = TRUE
+            ORDER BY c.created_at DESC
+        """
+        
+        cur.execute(query)
+        results = cur.fetchall()
+        
+        # Mapeo de categorías para mostrar nombres amigables
+        category_names = {
+            'servicios-academicos': 'Servicios Académicos',
+            'infraestructura': 'Infraestructura',
+            'servicios-estudiantiles': 'Servicios Estudiantiles',
+            'tecnologia': 'Tecnología',
+            'administrativo': 'Administrativo',
+            'biblioteca': 'Biblioteca',
+            'cafeteria': 'Cafetería',
+            'otro': 'Otro'
+        }
+        
+        tickets = []
+        for row in results:
+            ticket = {
+                'id': row[0],
+                'complaint_type': row[1],
+                'category': row[2],
+                'categoryName': category_names.get(row[2], row[2].title()),
+                'priority': row[3],
+                'title': row[4],
+                'content': row[5],
+                'incident_date': row[6].strftime('%Y-%m-%d') if row[6] else None,
+                'status': row[7],
+                'date': row[8].strftime('%Y-%m-%d'),
+                'created_at': row[8].strftime('%Y-%m-%d %H:%M:%S'),
+                'user': {
+                    'name': row[9],
+                    'last_name': row[10],
+                    'initials': row[11] if row[11] else f"{row[9][0]}{row[10][0]}".upper()
+                }
+            }
+            tickets.append(ticket)
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'tickets': tickets,
+            'total': len(tickets)
+        })
+        
+    except mariadb.Error as e:
+        print(f"Error fetching tickets: {e}")
+        if conn:
+            conn.close()
+        return jsonify({'error': 'Error al obtener los tickets'}), 500
+
+@app.route('/api/tickets/filter/<category>')
+def get_tickets_by_category(category):
+    """Endpoint para filtrar tickets por categoría"""
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'error': 'Error de conexión a la base de datos'}), 500
+    
+    try:
+        cur = conn.cursor()
+        
+        # Si la categoría es 'todos', obtener todos los tickets
+        if category == 'todos':
+            return get_tickets()
+        
+        query = """
+            SELECT 
+                c.id,
+                c.complaint_type,
+                c.category,
+                c.priority,
+                c.subject,
+                c.description,
+                c.incident_date,
+                c.status,
+                c.created_at,
+                u.name,
+                u.last_name,
+                u.avatar_initials
+            FROM complaints c
+            INNER JOIN users u ON c.user_id = u.id
+            WHERE u.is_active = TRUE AND c.category = ?
+            ORDER BY c.created_at DESC
+        """
+        
+        cur.execute(query, (category,))
+        results = cur.fetchall()
+        
+        category_names = {
+            'servicios-academicos': 'Servicios Académicos',
+            'infraestructura': 'Infraestructura',
+            'servicios-estudiantiles': 'Servicios Estudiantiles',
+            'tecnologia': 'Tecnología',
+            'administrativo': 'Administrativo',
+            'biblioteca': 'Biblioteca',
+            'cafeteria': 'Cafetería',
+            'otro': 'Otro'
+        }
+        
+        tickets = []
+        for row in results:
+            ticket = {
+                'id': row[0],
+                'complaint_type': row[1],
+                'category': row[2],
+                'categoryName': category_names.get(row[2], row[2].title()),
+                'priority': row[3],
+                'title': row[4],
+                'content': row[5],
+                'incident_date': row[6].strftime('%Y-%m-%d') if row[6] else None,
+                'status': row[7],
+                'date': row[8].strftime('%Y-%m-%d'),
+                'created_at': row[8].strftime('%Y-%m-%d %H:%M:%S'),
+                'user': {
+                    'name': row[9],
+                    'last_name': row[10],
+                    'initials': row[11] if row[11] else f"{row[9][0]}{row[10][0]}".upper()
+                }
+            }
+            tickets.append(ticket)
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'tickets': tickets,
+            'total': len(tickets),
+            'category': category
+        })
+        
+    except mariadb.Error as e:
+        print(f"Error filtering tickets: {e}")
+        if conn:
+            conn.close()
+        return jsonify({'error': 'Error al filtrar los tickets'}), 500
+
+@app.route('/api/tickets/stats')
+def get_tickets_stats():
+    """Endpoint para obtener estadísticas de tickets"""
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'error': 'Error de conexión a la base de datos'}), 500
+    
+    try:
+        cur = conn.cursor()
+        
+        # Estadísticas por estado
+        status_query = """
+            SELECT status, COUNT(*) as count
+            FROM complaints c
+            INNER JOIN users u ON c.user_id = u.id
+            WHERE u.is_active = TRUE
+            GROUP BY status
+        """
+        
+        cur.execute(status_query)
+        status_results = cur.fetchall()
+        
+        # Estadísticas por categoría
+        category_query = """
+            SELECT category, COUNT(*) as count
+            FROM complaints c
+            INNER JOIN users u ON c.user_id = u.id
+            WHERE u.is_active = TRUE
+            GROUP BY category
+        """
+        
+        cur.execute(category_query)
+        category_results = cur.fetchall()
+        
+        # Total de tickets
+        total_query = """
+            SELECT COUNT(*) as total
+            FROM complaints c
+            INNER JOIN users u ON c.user_id = u.id
+            WHERE u.is_active = TRUE
+        """
+        
+        cur.execute(total_query)
+        total_result = cur.fetchone()
+        
+        # Estadísticas por prioridad
+        priority_query = """
+            SELECT priority, COUNT(*) as count
+            FROM complaints c
+            INNER JOIN users u ON c.user_id = u.id
+            WHERE u.is_active = TRUE
+            GROUP BY priority
+        """
+        
+        cur.execute(priority_query)
+        priority_results = cur.fetchall()
+        
+        cur.close()
+        conn.close()
+        
+        stats = {
+            'total_tickets': total_result[0],
+            'by_status': {row[0]: row[1] for row in status_results},
+            'by_category': {row[0]: row[1] for row in category_results},
+            'by_priority': {row[0]: row[1] for row in priority_results}
+        }
+        
+        return jsonify({
+            'success': True,
+            'stats': stats
+        })
+        
+    except mariadb.Error as e:
+        print(f"Error getting stats: {e}")
+        if conn:
+            conn.close()
+        return jsonify({'error': 'Error al obtener estadísticas'}), 500
+
+@app.route('/api/tickets/user/<int:user_id>')
+def get_user_tickets(user_id):
+    """Endpoint para obtener tickets de un usuario específico"""
+    # Verificar autenticación
+    if "user_id" not in session:
+        return jsonify({'error': 'No autenticado'}), 401
+    
+    # Solo permitir ver sus propios tickets o si es admin
+    if session["user_id"] != user_id and session.get("role") != "admin":
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'error': 'Error de conexión a la base de datos'}), 500
+    
+    try:
+        cur = conn.cursor()
+        
+        query = """
+            SELECT 
+                c.id,
+                c.complaint_type,
+                c.category,
+                c.priority,
+                c.subject,
+                c.description,
+                c.incident_date,
+                c.status,
+                c.created_at,
+                u.name,
+                u.last_name,
+                u.avatar_initials
+            FROM complaints c
+            INNER JOIN users u ON c.user_id = u.id
+            WHERE c.user_id = ? AND u.is_active = TRUE
+            ORDER BY c.created_at DESC
+        """
+        
+        cur.execute(query, (user_id,))
+        results = cur.fetchall()
+        
+        category_names = {
+            'servicios-academicos': 'Servicios Académicos',
+            'infraestructura': 'Infraestructura',
+            'servicios-estudiantiles': 'Servicios Estudiantiles',
+            'tecnologia': 'Tecnología',
+            'administrativo': 'Administrativo',
+            'biblioteca': 'Biblioteca',
+            'cafeteria': 'Cafetería',
+            'otro': 'Otro'
+        }
+        
+        tickets = []
+        for row in results:
+            ticket = {
+                'id': row[0],
+                'complaint_type': row[1],
+                'category': row[2],
+                'categoryName': category_names.get(row[2], row[2].title()),
+                'priority': row[3],
+                'title': row[4],
+                'content': row[5],
+                'incident_date': row[6].strftime('%Y-%m-%d') if row[6] else None,
+                'status': row[7],
+                'date': row[8].strftime('%Y-%m-%d'),
+                'created_at': row[8].strftime('%Y-%m-%d %H:%M:%S'),
+                'user': {
+                    'name': row[9],
+                    'last_name': row[10],
+                    'initials': row[11] if row[11] else f"{row[9][0]}{row[10][0]}".upper()
+                }
+            }
+            tickets.append(ticket)
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'tickets': tickets,
+            'total': len(tickets),
+            'user_id': user_id
+        })
+        
+    except mariadb.Error as e:
+        print(f"Error getting user tickets: {e}")
+        if conn:
+            conn.close()
+        return jsonify({'error': 'Error al obtener tickets del usuario'}), 500
+
+@app.route('/api/tickets/<int:ticket_id>/status', methods=['PUT'])
+def update_ticket_status(ticket_id):
+    """Endpoint para actualizar el estado de un ticket (solo admin)"""
+    if "user_id" not in session or session.get("role") != "admin":
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    try:
+        data = request.get_json()
+        new_status = data.get('status', '').strip()
+        
+        if new_status not in ['pendiente', 'en-proceso', 'resuelto', 'escalado']:
+            return jsonify({'error': 'Estado no válido'}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Error de conexión a la base de datos'}), 500
+        
+        cur = conn.cursor()
+        
+        # Actualizar el estado del ticket
+        cur.execute("""
+            UPDATE complaints 
+            SET status = ?, updated_at = CURRENT_TIMESTAMP 
+            WHERE id = ?
+        """, (new_status, ticket_id))
+        
+        if cur.rowcount == 0:
+            cur.close()
+            conn.close()
+            return jsonify({'error': 'Ticket no encontrado'}), 404
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Estado actualizado correctamente',
+            'ticket_id': ticket_id,
+            'new_status': new_status
+        })
+        
+    except Exception as e:
+        print(f"Error updating ticket status: {e}")
+        return jsonify({'error': 'Error al actualizar el estado'}), 500
+
+# ====== FIN DE NUEVOS ENDPOINTS ======
+
+@app.route("/profile", methods=["GET", "POST"])
 def profile():
     if "user_id" not in session:
         flash("Debes iniciar sesión para acceder a tu perfil", "warning")
         return redirect(url_for("auth"))
-    
-    return render_template("profile.html")
 
-@app.route("/post")
+    user_id = session["user_id"]
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"success": False, "message": "Error de conexión con base de datos"}), 500
+    cur = conn.cursor()
+
+    if request.method == "POST":
+        data = request.get_json()
+        name = data.get("name", "").strip()
+        last_name = data.get("last_name", "").strip()
+        email = data.get("email", "").strip().lower()
+        study_area = data.get("study_area", "").strip()
+        study_speciality = data.get("study_speciality", "").strip()
+        term = data.get("term", 1)
+        personal_description = data.get("personal_description", "").strip()
+        initials = f"{name[0]}{last_name[0]}".upper() if name and last_name else ""
+
+        try:
+            cur.execute("""
+                UPDATE users SET
+                    name = ?, last_name = ?, email = ?, 
+                    study_area = ?, study_speciality = ?, 
+                    term = ?, personal_description = ?, 
+                    avatar_initials = ?
+                WHERE id = ?
+            """, (name, last_name, email, study_area, study_speciality, term, personal_description, initials, user_id))
+            conn.commit()
+            cur.close()
+            conn.close()
+
+            session["name"] = name
+            session["last_name"] = last_name
+            session["email"] = email
+            session["study_area"] = study_area
+            session["study_speciality"] = study_speciality
+            session["term"] = term
+
+            return jsonify({"success": True, "message": "Perfil actualizado correctamente"})
+        except mariadb.Error as e:
+            return jsonify({"success": False, "message": f"Error al actualizar: {e}"})
+
+    cur.execute("SELECT name, last_name, email, study_area, study_speciality, term, personal_description FROM users WHERE id = ?", (user_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    user_data = {
+        "name": row[0],
+        "last_name": row[1],
+        "email": row[2],
+        "study_area": row[3],
+        "study_speciality": row[4],
+        "term": row[5],
+        "personal_description": row[6],
+        "initials": f"{row[0][0]}{row[1][0]}".upper() if row[0] and row[1] else ""
+    }
+
+    return render_template("profile.html", user=user_data)
+
+@app.route("/post", methods=["GET", "POST"])
 def post():
     if "user_id" not in session:
         flash("Debes iniciar sesión para crear una queja", "warning")
         return redirect(url_for("auth"))
     
-    return render_template("post.html")
+    if request.method == "POST":
+        try:
+            data = request.get_json() if request.is_json else request.form
+            
+            complaint_type = data.get("type", "").strip()
+            category = data.get("category", "").strip()
+            priority = data.get("priority", "").strip()
+            subject = data.get("subject", "").strip()
+            description = data.get("description", "").strip()
+            incident_date = data.get("incident_date")
+
+            errors = []
+            if not complaint_type:
+                errors.append("El tipo de solicitud es requerido")
+            if not category:
+                errors.append("La categoría es requerida")
+            if not priority:
+                errors.append("La prioridad es requerida")
+            if not subject or len(subject) < 5:
+                errors.append("El asunto es requerido (mínimo 5 caracteres)")
+            if not description or len(description) < 20:
+                errors.append("La descripción es requerida (mínimo 20 caracteres)")
+            
+            if errors:
+                return jsonify({
+                    "success": False,
+                    "message": "Errores de validación",
+                    "errors": errors
+                }), 400
+            
+            conn = get_db_connection()
+            if not conn:
+                return jsonify({
+                    "success": False,
+                    "message": "Error de conexión a la base de datos"
+                }), 500
+            
+            try:
+                cur = conn.cursor()
+                query = """
+                    INSERT INTO complaints (
+                        user_id, complaint_type, category, priority, 
+                        subject, description, incident_date, status
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'pendiente')
+                """
+                
+                cur.execute(query, (
+                    session["user_id"],
+                    complaint_type,
+                    category,
+                    priority,
+                    subject,
+                    description,
+                    incident_date if incident_date else None
+                ))
+                
+                conn.commit()
+                complaint_id = cur.lastrowid
+                cur.close()
+                conn.close()
+                
+                return jsonify({
+                    "success": True,
+                    "message": "¡Solicitud enviada correctamente! Te contactaremos pronto.",
+                    "complaint_id": complaint_id
+                }), 201
+                
+            except mariadb.Error as e:
+                print(f"Error al crear queja: {e}")
+                return jsonify({
+                    "success": False,
+                    "message": "Error al guardar la solicitud"
+                }), 500
+                
+        except Exception as e:
+            print(f"Error en post: {e}")
+            return jsonify({
+                "success": False,
+                "message": "Error interno del servidor"
+            }), 500
+    
+    user_data = {
+        "full_name": f"{session['name']} {session['last_name']}",
+        "email": session['email'],
+        "study_area": session.get("study_area", ""),
+        "term": session.get("term", "")
+    }
+    
+    return render_template("post.html", user=user_data)
 
 @app.route("/student-dashboard")
 def student_dashboard():
