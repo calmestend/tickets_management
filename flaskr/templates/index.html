@@ -396,7 +396,6 @@
 		<div style="display: flex; gap: 10px; flex-wrap: wrap;">
 			${data.user.role === 'admin' ? '<a href="/ticket" class="login-btn primary">Validar Tickets</a>' : '<a href="/post" class="login-btn primary">Nueva queja/sugerencia</a>'}
 			${data.user.role === 'admin' ? '' : '<a href="/profile" class="login-btn">Mi Perfil</a>'}
-			${data.user.role === 'admin' ? '<a href="/admin-dashboard" class="login-btn">Panel Admin</a>' : ''}
 			<a href="/logout" class="login-btn logout">Cerrar Sesión</a>
 		</div>
 	`;

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Resolver Ticket - UTC</title>
+	<style>
+		:root {
+			--primary-color: #17A67D;
+			--secondary-color: #0D0D0D;
+			--accent-color: #F2F2F2;
+			--text-color: #333333;
+			--highlight-color: #0FBBC9;
+			--danger-color: #dc3545;
+			--warning-color: #ffc107;
+			--success-color: #28a745;
+		}
+
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background-color: var(--accent-color);
+			color: var(--text-color);
+			line-height: 1.6;
+			margin: 0;
+			padding: 0;
+		}
+
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+
+		.header {
+			background: linear-gradient(135deg, var(--primary-color), var(--highlight-color));
+			color: white;
+			padding: 1rem 0;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+		}
+
+		.header-content {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.logo {
+			height: 60px;
+			width: auto;
+		}
+
+		.admin-info {
+			display: flex;
+			align-items: center;
+			gap: 15px;
+		}
+
+		.admin-avatar {
+			background-color: rgba(255, 255, 255, 0.2);
+			color: white;
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: bold;
+		}
+
+		.ticket-container {
+			background: white;
+			border-radius: 10px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			padding: 2rem;
+			margin-top: 2rem;
+		}
+
+		.ticket-header {
+			border-bottom: 1px solid #eee;
+			padding-bottom: 1rem;
+			margin-bottom: 1.5rem;
+		}
+
+		.ticket-title {
+			font-size: 1.5rem;
+			color: var(--primary-color);
+			margin-bottom: 0.5rem;
+		}
+
+		.ticket-meta {
+			display: flex;
+			gap: 1rem;
+			margin-bottom: 1rem;
+			font-size: 0.9rem;
+			color: #666;
+		}
+
+		.ticket-meta span {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.badge {
+			padding: 0.25rem 0.75rem;
+			border-radius: 20px;
+			font-size: 0.8rem;
+			font-weight: 500;
+		}
+
+		.priority-alta {
+			background-color: #ffebee;
+			color: #c62828;
+		}
+
+		.priority-media {
+			background-color: #fff3e0;
+			color: #e65100;
+		}
+
+		.priority-baja {
+			background-color: #e8f5e8;
+			color: #2e7d32;
+		}
+
+		.status-pendiente {
+			background-color: #fff3cd;
+			color: #856404;
+		}
+
+		.status-en-proceso {
+			background-color: #d1ecf1;
+			color: #0c5460;
+		}
+
+		.status-resuelto {
+			background-color: #d4edda;
+			color: #155724;
+		}
+
+		.status-escalado {
+			background-color: #f8d7da;
+			color: #721c24;
+		}
+
+		.category-badge {
+			background-color: var(--primary-color);
+			color: white;
+		}
+
+		.ticket-content {
+			margin-bottom: 2rem;
+			line-height: 1.7;
+			white-space: pre-line;
+		}
+
+		.user-info {
+			background-color: #f8f9fa;
+			padding: 1rem;
+			border-radius: 8px;
+			margin-bottom: 2rem;
+		}
+
+		.user-info h3 {
+			margin-top: 0;
+			color: var(--primary-color);
+		}
+
+		.form-group {
+			margin-bottom: 1.5rem;
+		}
+
+		.form-label {
+			display: block;
+			margin-bottom: 0.5rem;
+			font-weight: 500;
+		}
+
+		.form-control {
+			width: 100%;
+			padding: 0.75rem;
+			border: 2px solid #ddd;
+			border-radius: 8px;
+			font-size: 1rem;
+			transition: border-color 0.3s ease;
+		}
+
+		.form-control:focus {
+			outline: none;
+			border-color: var(--primary-color);
+		}
+
+		textarea.form-control {
+			min-height: 150px;
+			resize: vertical;
+		}
+
+		.form-row {
+			display: flex;
+			gap: 1rem;
+			margin-bottom: 1.5rem;
+		}
+
+		.form-col {
+			flex: 1;
+		}
+
+		.btn {
+			padding: 0.75rem 1.5rem;
+			border: none;
+			border-radius: 8px;
+			font-size: 1rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			text-decoration: none;
+			display: inline-block;
+			text-align: center;
+		}
+
+		.btn-primary {
+			background-color: var(--primary-color);
+			color: white;
+		}
+
+		.btn-primary:hover {
+			background-color: #138f66;
+			transform: translateY(-2px);
+		}
+
+		.btn-secondary {
+			background-color: #6c757d;
+			color: white;
+		}
+
+		.btn-secondary:hover {
+			background-color: #5a6268;
+		}
+
+		.btn-danger {
+			background-color: var(--danger-color);
+			color: white;
+		}
+
+		.btn-danger:hover {
+			background-color: #c82333;
+		}
+
+		.btn-group {
+			display: flex;
+			gap: 1rem;
+			margin-top: 2rem;
+		}
+
+		.checkbox-group {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.checkbox-label {
+			margin: 0;
+			font-weight: normal;
+		}
+
+		@media (max-width: 768px) {
+			.form-row {
+				flex-direction: column;
+			}
+
+			.btn-group {
+				flex-direction: column;
+			}
+
+			.btn {
+				width: 100%;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="header">
+		<div class="container header-content">
+			<img
+				src="https://imgs.search.brave.com/6UqI_wisZKzgwoye0pTp0QUoyrtCN3zs4PDPRvQcE2o/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly91dGMt/bWF4Lm14L3N0YXRp/Yy9pbWdzL2xvZ29z/L2xvZ29fdXRjLnBu/Zw"
+				alt="UTC" class="logo">
+			<div class="admin-info">
+				<div class="admin-avatar" id="adminAvatar">AD</div>
+				<div>
+					<div><strong id="adminName">Administrador</strong></div>
+					<div style="font-size: 0.9rem; opacity: 0.8;">Panel de Resolución</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="ticket-container">
+			<div class="ticket-header">
+				<h1 class="ticket-title" id="ticketTitle">Cargando ticket...</h1>
+				<div class="ticket-meta">
+					<span>
+						<strong>Categoría:</strong>
+						<span class="badge category-badge" id="ticketCategory">Cargando...</span>
+					</span>
+					<span>
+						<strong>Prioridad:</strong>
+						<span class="badge" id="ticketPriority">Cargando...</span>
+					</span>
+					<span>
+						<strong>Estado:</strong>
+						<span class="badge" id="ticketStatus">Cargando...</span>
+					</span>
+					<span>
+						<strong>Fecha:</strong>
+						<span id="ticketDate">Cargando...</span>
+					</span>
+				</div>
+			</div>
+
+			<div class="user-info">
+				<h3>Información del Usuario</h3>
+				<p><strong>Nombre:</strong> <span id="userName">Cargando...</span></p>
+				<p><strong>Email:</strong> <span id="userEmail">Cargando...</span></p>
+			</div>
+
+			<div class="ticket-content" id="ticketContent">
+				Cargando contenido del ticket...
+			</div>
+
+			<h2>Resolver Ticket</h2>
+
+			<form id="resolutionForm">
+				<div class="form-row">
+					<div class="form-col">
+						<div class="form-group">
+							<label for="assignedTo" class="form-label">Asignado a</label>
+							<input type="text" id="assignedTo" class="form-control" required>
+						</div>
+					</div>
+					<div class="form-col">
+						<div class="form-group">
+							<label for="statusSelect" class="form-label">Estado</label>
+							<select id="statusSelect" class="form-control" required>
+								<option value="pendiente">Pendiente</option>
+								<option value="en-proceso">En Proceso</option>
+								<option value="resuelto">Resuelto</option>
+								<option value="escalado">Escalado</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-col">
+						<div class="form-group">
+							<label for="resolutionDate" class="form-label">Fecha de resolución</label>
+							<input type="date" id="resolutionDate" class="form-control" required>
+						</div>
+					</div>
+					<div class="form-col">
+						<div class="form-group">
+							<label for="timeSpent" class="form-label">Tiempo invertido (horas)</label>
+							<input type="number" step="0.5" id="timeSpent" class="form-control">
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="adminResponse" class="form-label">Respuesta del administrador</label>
+					<textarea id="adminResponse" class="form-control" required></textarea>
+				</div>
+
+				<div class="form-group">
+					<div class="checkbox-group">
+						<input type="checkbox" id="followUpRequired">
+						<label for="followUpRequired" class="checkbox-label">Requiere seguimiento</label>
+					</div>
+					<input type="date" id="followUpDate" class="form-control" style="margin-top: 0.5rem; display: none;">
+				</div>
+
+				<div class="form-group">
+					<label for="internalNotes" class="form-label">Notas internas</label>
+					<textarea id="internalNotes" class="form-control"></textarea>
+				</div>
+
+				<div class="btn-group">
+					<button type="button" class="btn btn-primary" id="resolveBtn">Guardar Resolución</button>
+					<a href="/ticket" class="btn btn-secondary">Volver al Listado</a>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script>
+		// Mostrar/ocultar campo de fecha de seguimiento según checkbox
+		document.getElementById('followUpRequired').addEventListener('change', function () {
+			const followUpDate = document.getElementById('followUpDate');
+			followUpDate.style.display = this.checked ? 'block' : 'none';
+			followUpDate.required = this.checked;
+		});
+
+		// Función para formatear fechas
+		function formatDate(dateString) {
+			if (!dateString) return 'No especificada';
+			try {
+				const date = new Date(dateString);
+				return date.toLocaleDateString('es-ES', {
+					year: 'numeric',
+					month: '2-digit',
+					day: '2-digit'
+				});
+			} catch (e) {
+				return dateString;
+			}
+		}
+
+		// Función para obtener texto de prioridad
+		function getPriorityText(priority) {
+			const priorities = {
+				'alta': 'Alta',
+				'media': 'Media',
+				'baja': 'Baja'
+			};
+			return priorities[priority] || priority;
+		}
+
+		// Función para obtener texto de estado
+		function getStatusText(status) {
+			const statuses = {
+				'pendiente': 'Pendiente',
+				'en-proceso': 'En Proceso',
+				'resuelto': 'Resuelto',
+				'escalado': 'Escalado'
+			};
+			return statuses[status] || status;
+		}
+
+		// Función para cargar los datos del ticket
+		async function loadTicketData(ticketId) {
+			try {
+				const response = await fetch(`/api/tickets/${ticketId}`);
+				if (!response.ok) {
+					throw new Error(`Error HTTP: ${response.status}`);
+				}
+
+				const data = await response.json();
+
+				if (data.success && data.ticket) {
+					const ticket = data.ticket;
+
+					// Llenar los campos de visualización
+					document.getElementById('ticketTitle').textContent = ticket.subject || 'Sin asunto';
+					document.getElementById('ticketContent').textContent = ticket.description || 'Sin descripción';
+					document.getElementById('ticketCategory').textContent = ticket.categoryName || 'Sin categoría';
+
+					const priorityBadge = document.getElementById('ticketPriority');
+					priorityBadge.textContent = getPriorityText(ticket.priority);
+					priorityBadge.className = `badge priority-${ticket.priority}`;
+
+					const statusBadge = document.getElementById('ticketStatus');
+					statusBadge.textContent = getStatusText(ticket.status);
+					statusBadge.className = `badge status-${ticket.status}`;
+
+					document.getElementById('ticketDate').textContent = formatDate(ticket.created_at);
+					document.getElementById('userName').textContent = `${ticket.user?.name || 'Nombre'} ${ticket.user?.last_name || 'Apellido'}`;
+					document.getElementById('userEmail').textContent = ticket.user?.email || 'Sin email';
+
+					// Llenar el formulario de resolución
+					document.getElementById('statusSelect').value = ticket.status || 'pendiente';
+
+					if (ticket.response) {
+						document.getElementById('assignedTo').value = ticket.response.assigned_to || '';
+						document.getElementById('adminResponse').value = ticket.response.admin_response || '';
+						document.getElementById('resolutionDate').value = ticket.response.resolution_date || '';
+						document.getElementById('timeSpent').value = ticket.response.time_spent || '';
+						document.getElementById('followUpRequired').checked = ticket.response.follow_up_required || false;
+						document.getElementById('followUpDate').value = ticket.response.follow_up_date || '';
+						document.getElementById('internalNotes').value = ticket.response.internal_notes || '';
+
+						if (ticket.response.follow_up_required) {
+							document.getElementById('followUpDate').style.display = 'block';
+						}
+					} else {
+						// Valores por defecto para tickets sin respuesta previa
+						const today = new Date().toISOString().split('T')[0];
+						document.getElementById('resolutionDate').value = today;
+					}
+				}
+			} catch (error) {
+				console.error('Error al cargar los datos del ticket:', error);
+				alert('Error al cargar los datos del ticket. Por favor, recarga la página.');
+			}
+		}
+
+		// Función para resolver el ticket
+		async function resolveTicket(ticketId) {
+			try {
+				const formData = {
+					assigned_to: document.getElementById('assignedTo').value,
+					admin_response: document.getElementById('adminResponse').value,
+					status: document.getElementById('statusSelect').value,
+					resolution_date: document.getElementById('resolutionDate').value,
+					time_spent: document.getElementById('timeSpent').value,
+					follow_up_required: document.getElementById('followUpRequired').checked,
+					follow_up_date: document.getElementById('followUpDate').value,
+					internal_notes: document.getElementById('internalNotes').value
+				};
+
+				// Validación básica
+				if (!formData.assigned_to || !formData.admin_response || !formData.resolution_date) {
+					alert('Por favor complete todos los campos requeridos');
+					return;
+				}
+
+				const response = await fetch(`/api/tickets/${ticketId}/resolve`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(formData)
+				});
+
+				const data = await response.json();
+
+				if (data.success) {
+					alert('Ticket resuelto exitosamente');
+					window.location.href = '/ticket';
+				} else {
+					alert(`Error: ${data.message || 'No se pudo resolver el ticket'}`);
+				}
+			} catch (error) {
+				console.error('Error al resolver el ticket:', error);
+				alert('Error al resolver el ticket. Por favor, intente nuevamente.');
+			}
+		}
+
+		// Cargar los datos cuando la página esté lista
+		document.addEventListener('DOMContentLoaded', function () {
+			// Obtener el ID del ticket de la URL
+			const pathParts = window.location.pathname.split('/');
+			const ticketId = pathParts[pathParts.length - 1];
+
+			if (ticketId && !isNaN(ticketId)) {
+				// Configurar el botón de resolución
+				document.getElementById('resolveBtn').onclick = () => resolveTicket(ticketId);
+
+				// Cargar los datos del ticket
+				loadTicketData(ticketId);
+
+				// Cargar información del administrador
+				checkAdminSession();
+			} else {
+				alert('ID de ticket no válido');
+				window.location.href = '/ticket';
+			}
+		});
+
+		// Verificar sesión de administrador
+		async function checkAdminSession() {
+			try {
+				const response = await fetch('/check-session');
+				const data = await response.json();
+
+				if (data.authenticated && data.user.role === 'admin') {
+					document.getElementById('adminName').textContent = data.user.name;
+					const initials = data.user.name.substring(0, 2).toUpperCase();
+					document.getElementById('adminAvatar').textContent = initials;
+				} else {
+					window.location.href = '/auth';
+				}
+			} catch (error) {
+				console.error('Error al verificar la sesión:', error);
+				window.location.href = '/auth';
+			}
+		}
+	</script>
+</body>
+
+</html>

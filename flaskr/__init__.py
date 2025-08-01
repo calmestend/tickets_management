@@ -679,6 +679,382 @@ def admin_dashboard():
     
     return render_template("admin_dashboard.html")
 
+@app.route("/ticket")
+def ticket_validation():
+    """Página para validar tickets - solo admin"""
+    if "user_id" not in session:
+        return redirect(url_for("auth"))
+    
+    if session.get("role") != "admin":
+        flash("Acceso no autorizado", "error")
+        return redirect(url_for("auth"))
+    
+    return render_template("ticket.html")
+
+
+@app.route("/ticket/<int:ticket_id>")
+def ticket_detail(ticket_id):
+    """Página de detalle de ticket para resolución - solo admin"""
+    if "user_id" not in session:
+        return redirect(url_for("auth"))
+    
+    if session.get("role") != "admin":
+        flash("Acceso no autorizado", "error")
+        return redirect(url_for("auth"))
+    
+    conn = get_db_connection()
+    if not conn:
+        flash("Error de conexión a la base de datos", "error")
+        return redirect(url_for("ticket_validation"))
+    
+    try:
+        cur = conn.cursor()
+        
+        # Cambiado a %s para MariaDB
+        query = """
+            SELECT 
+                c.id, c.complaint_type, c.category, c.priority, c.subject, 
+                c.description, c.incident_date, c.status, c.created_at,
+                u.name, u.last_name, u.email, u.study_area, u.term,
+                cr.assigned_to, cr.admin_response, cr.resolution_date,
+                cr.time_spent, cr.follow_up_required, cr.follow_up_date,
+                cr.internal_notes
+            FROM complaints c
+            INNER JOIN users u ON c.user_id = u.id
+            LEFT JOIN complaint_responses cr ON c.id = cr.complaint_id
+            WHERE c.id = %s AND u.is_active = TRUE
+        """
+        
+        cur.execute(query, (ticket_id,))
+        result = cur.fetchone()
+        
+        if not result:
+            flash("Ticket no encontrado", "error")
+            return redirect(url_for("ticket_validation"))
+        
+        category_names = {
+            'servicios-academicos': 'Servicios Académicos',
+            'infraestructura': 'Infraestructura',
+            'servicios-estudiantiles': 'Servicios Estudiantiles',
+            'tecnologia': 'Tecnología',
+            'administrativo': 'Administrativo',
+            'biblioteca': 'Biblioteca',
+            'cafeteria': 'Cafetería',
+            'otro': 'Otro'
+        }
+        
+        ticket_data = {
+            'id': result[0],
+            'complaint_type': result[1],
+            'category': result[2],
+            'categoryName': category_names.get(result[2], result[2].title()),
+            'priority': result[3],
+            'subject': result[4],
+            'description': result[5],
+            'incident_date': result[6].strftime('%Y-%m-%d') if result[6] else None,
+            'status': result[7],
+            'created_at': result[8].strftime('%Y-%m-%d') if result[8] else None,
+            'user': {
+                'name': result[9],
+                'last_name': result[10],
+                'email': result[11],
+                'study_area': result[12],
+                'term': result[13]
+            },
+            'response': {
+                'assigned_to': result[14],
+                'admin_response': result[15],
+                'resolution_date': result[16].strftime('%Y-%m-%d') if result[16] else None,
+                'time_spent': float(result[17]) if result[17] else None,
+                'follow_up_required': result[18],
+                'follow_up_date': result[19].strftime('%Y-%m-%d') if result[19] else None,
+                'internal_notes': result[20]
+            }
+        }
+        
+        cur.close()
+        conn.close()
+        
+        return render_template("ticket_resolution.html", ticket=ticket_data)
+        
+    except mariadb.Error as e:
+        print(f"Error getting ticket detail: {e}")
+        flash("Error al obtener los datos del ticket", "error")
+        return redirect(url_for("ticket_validation"))
+
+@app.route("/api/tickets/<int:ticket_id>")
+def api_ticket_detail(ticket_id):
+    """Endpoint API para obtener detalles del ticket"""
+    if "user_id" not in session or session.get("role") != "admin":
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+    
+    conn = get_db_connection()
+    if not conn:
+        flash("Error de conexión a la base de datos", "error")
+        return redirect(url_for("ticket_validation"))
+    
+    try:
+        cur = conn.cursor()
+        query = """
+            SELECT 
+                c.id, c.complaint_type, c.category, c.priority, c.subject, 
+                c.description, c.incident_date, c.status, c.created_at,
+                u.name, u.last_name, u.email, u.study_area, u.term,
+                cr.assigned_to, cr.admin_response, cr.resolution_date,
+                cr.time_spent, cr.follow_up_required, cr.follow_up_date,
+                cr.internal_notes
+            FROM complaints c
+            INNER JOIN users u ON c.user_id = u.id
+            LEFT JOIN complaint_responses cr ON c.id = cr.complaint_id
+            WHERE c.id = %s AND u.is_active = TRUE
+        """
+        
+        cur.execute(query, (ticket_id,))
+        result = cur.fetchone()
+        
+        if not result:
+            return jsonify({"success": False, "message": "Ticket not found"}), 404
+        
+        category_names = {
+            'servicios-academicos': 'Servicios Académicos',
+            'infraestructura': 'Infraestructura',
+            'servicios-estudiantiles': 'Servicios Estudiantiles',
+            'tecnologia': 'Tecnología',
+            'administrativo': 'Administrativo',
+            'biblioteca': 'Biblioteca',
+            'cafeteria': 'Cafetería',
+            'otro': 'Otro'
+        }
+        
+        ticket_data = {
+            'success': True,
+            'ticket': {
+                'id': result[0],
+                'complaint_type': result[1],
+                'category': result[2],
+                'categoryName': category_names.get(result[2], result[2].title()),
+                'priority': result[3],
+                'subject': result[4],
+                'description': result[5],
+                'incident_date': result[6].strftime('%Y-%m-%d') if result[6] else None,
+                'status': result[7],
+                'created_at': result[8].strftime('%Y-%m-%d') if result[8] else None,
+                'user': {
+                    'name': result[9],
+                    'last_name': result[10],
+                    'email': result[11],
+                    'study_area': result[12],
+                    'term': result[13]
+                },
+                'response': {
+                    'assigned_to': result[14],
+                    'admin_response': result[15],
+                    'resolution_date': result[16].strftime('%Y-%m-%d') if result[16] else None,
+                    'time_spent': float(result[17]) if result[17] else None,
+                    'follow_up_required': result[18],
+                    'follow_up_date': result[19].strftime('%Y-%m-%d') if result[19] else None,
+                    'internal_notes': result[20]
+                }
+            }
+        }
+        
+        return jsonify(ticket_data)
+        
+    except mariadb.Error as e:
+        print(f"API Error getting ticket detail: {e}")
+        return jsonify({"success": False, "message": "Database error"}), 500
+    finally:
+        if 'cur' in locals(): cur.close()
+        if conn: conn.close()
+
+@app.route("/api/tickets/<int:ticket_id>/resolve", methods=["POST"])
+def resolve_ticket(ticket_id):
+    """Endpoint para resolver un ticket"""
+    if "user_id" not in session or session.get("role") != "admin":
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({"success": False, "message": "No data provided"}), 400
+    
+    required_fields = ['assigned_to', 'admin_response', 'status', 'resolution_date']
+    for field in required_fields:
+        if not data.get(field):
+            return jsonify({"success": False, "message": f"Missing required field: {field}"}), 400
+    
+    # Validar y formatear time_spent
+    time_spent = data.get('time_spent')
+    if time_spent == '' or time_spent is None:
+        time_spent = None  # Permitir NULL en la base de datos
+    else:
+        try:
+            time_spent = float(time_spent)
+            if time_spent < 0 or time_spent > 99.99:  # DECIMAL(4,2) permite hasta 99.99
+                return jsonify({"success": False, "message": "El tiempo invertido debe estar entre 0 y 99.99 horas"}), 400
+        except ValueError:
+            return jsonify({"success": False, "message": "El tiempo invertido debe ser un número válido"}), 400
+    
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"success": False, "message": "Database error"}), 500
+    
+    try:
+        cur = conn.cursor()
+        
+        # 1. Actualizar el estado del ticket en la tabla complaints
+        update_complaint = """
+            UPDATE complaints 
+            SET status = %s 
+            WHERE id = %s
+        """
+        cur.execute(update_complaint, (data['status'], ticket_id))
+        
+        # 2. Insertar o actualizar la respuesta en complaint_responses
+        cur.execute("SELECT id FROM complaint_responses WHERE complaint_id = %s", (ticket_id,))
+        existing_response = cur.fetchone()
+        
+        if existing_response:
+            update_response = """
+                UPDATE complaint_responses 
+                SET assigned_to = %s, 
+                    admin_response = %s, 
+                    resolution_date = %s, 
+                    time_spent = %s, 
+                    follow_up_required = %s, 
+                    follow_up_date = %s, 
+                    internal_notes = %s 
+                WHERE complaint_id = %s
+            """
+            cur.execute(update_response, (
+                data['assigned_to'],
+                data['admin_response'],
+                data['resolution_date'],
+                time_spent,
+                data.get('follow_up_required', False),
+                data.get('follow_up_date'),
+                data.get('internal_notes'),
+                ticket_id
+            ))
+        else:
+            insert_response = """
+                INSERT INTO complaint_responses (
+                    complaint_id, assigned_to, admin_response, 
+                    resolution_date, time_spent, follow_up_required, 
+                    follow_up_date, internal_notes
+                ) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            cur.execute(insert_response, (
+                ticket_id,
+                data['assigned_to'],
+                data['admin_response'],
+                data['resolution_date'],
+                time_spent,
+                data.get('follow_up_required', False),
+                data.get('follow_up_date'),
+                data.get('internal_notes')
+            ))
+        
+        conn.commit()
+        return jsonify({"success": True, "message": "Ticket resuelto exitosamente"})
+        
+    except mariadb.Error as e:
+        conn.rollback()
+        print(f"Error resolving ticket: {e}")
+        return jsonify({"success": False, "message": "Database error"}), 500
+    finally:
+        if 'cur' in locals(): cur.close()
+        if conn: conn.close()
+
+@app.route('/api/tickets/<int:ticket_id>')
+def get_ticket_details(ticket_id):
+    """Endpoint para obtener detalles de un ticket específico"""
+    if "user_id" not in session or session.get("role") != "admin":
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'error': 'Error de conexión a la base de datos'}), 500
+    
+    try:
+        cur = conn.cursor()
+        
+        # Query para obtener el ticket con información del usuario
+        query = """
+            SELECT 
+                c.id, c.complaint_type, c.category, c.priority, c.subject, 
+                c.description, c.incident_date, c.status, c.created_at,
+                u.name, u.last_name, u.email, u.study_area, u.term,
+                cr.assigned_to, cr.admin_response, cr.resolution_date,
+                cr.time_spent, cr.follow_up_required, cr.follow_up_date,
+                cr.internal_notes
+            FROM complaints c
+            INNER JOIN users u ON c.user_id = u.id
+            LEFT JOIN complaint_responses cr ON c.id = cr.complaint_id
+            WHERE c.id = ? AND u.is_active = TRUE
+        """
+        
+        cur.execute(query, (ticket_id,))
+        result = cur.fetchone()
+        
+        if not result:
+            return jsonify({'error': 'Ticket no encontrado'}), 404
+        
+        # Mapeo de categorías para mostrar nombres amigables
+        category_names = {
+            'servicios-academicos': 'Servicios Académicos',
+            'infraestructura': 'Infraestructura',
+            'servicios-estudiantiles': 'Servicios Estudiantiles',
+            'tecnologia': 'Tecnología',
+            'administrativo': 'Administrativo',
+            'biblioteca': 'Biblioteca',
+            'cafeteria': 'Cafetería',
+            'otro': 'Otro'
+        }
+        
+        ticket_data = {
+            'id': result[0],
+            'complaint_type': result[1],
+            'category': result[2],
+            'categoryName': category_names.get(result[2], result[2].title()),
+            'priority': result[3],
+            'subject': result[4],
+            'description': result[5],
+            'incident_date': result[6].strftime('%Y-%m-%d') if result[6] else None,
+            'status': result[7],
+            'created_at': result[8].strftime('%Y-%m-%d %H:%M:%S'),
+            'user': {
+                'name': result[9],
+                'last_name': result[10],
+                'email': result[11],
+                'study_area': result[12],
+                'term': result[13]
+            },
+            'response': {
+                'assigned_to': result[14],
+                'admin_response': result[15],
+                'resolution_date': result[16].strftime('%Y-%m-%d') if result[16] else None,
+                'time_spent': float(result[17]) if result[17] else None,
+                'follow_up_required': bool(result[18]),
+                'follow_up_date': result[19].strftime('%Y-%m-%d') if result[19] else None,
+                'internal_notes': result[20]
+            }
+        }
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'ticket': ticket_data
+        })
+        
+    except mariadb.Error as e:
+        print(f"Error getting ticket details: {e}")
+        if conn:
+            conn.close()
+        return jsonify({'error': 'Error al obtener los detalles del ticket'}), 500
+
 @app.route("/check-session")
 def check_session():
     if "user_id" in session:
@@ -710,6 +1086,8 @@ def inject_user():
             "is_authenticated": True
         }
     return {"current_user": None, "is_authenticated": False}
+
+
 
 @app.errorhandler(404)
 def not_found(error):

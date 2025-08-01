@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Validar Tickets - Administrador UTC</title>
+	<style>
+		:root {
+			--primary-color: #17A67D;
+			--secondary-color: #0D0D0D;
+			--accent-color: #F2F2F2;
+			--text-color: #333333;
+			--highlight-color: #0FBBC9;
+			--danger-color: #dc3545;
+			--warning-color: #ffc107;
+			--success-color: #28a745;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background-color: var(--accent-color);
+			color: var(--text-color);
+			line-height: 1.6;
+		}
+
+		.header {
+			background: linear-gradient(135deg, var(--primary-color), var(--highlight-color));
+			color: white;
+			padding: 1rem 0;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+		}
+
+		.header-content {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 0 20px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.logo {
+			height: 60px;
+			width: auto;
+		}
+
+		.admin-info {
+			display: flex;
+			align-items: center;
+			gap: 15px;
+		}
+
+		.admin-avatar {
+			background-color: rgba(255, 255, 255, 0.2);
+			color: white;
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: bold;
+		}
+
+		.main-container {
+			max-width: 1200px;
+			margin: 2rem auto;
+			padding: 0 20px;
+		}
+
+		.page-header {
+			background: white;
+			padding: 2rem;
+			border-radius: 10px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			margin-bottom: 2rem;
+			text-align: center;
+		}
+
+		.page-title {
+			color: var(--primary-color);
+			font-size: 2.2rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.page-subtitle {
+			color: #666;
+			font-size: 1.1rem;
+		}
+
+		.stats-section {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 1rem;
+			margin-bottom: 2rem;
+		}
+
+		.stat-card {
+			background: white;
+			padding: 1.5rem;
+			border-radius: 10px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			text-align: center;
+			transition: transform 0.3s ease;
+		}
+
+		.stat-card:hover {
+			transform: translateY(-5px);
+		}
+
+		.stat-number {
+			font-size: 2rem;
+			font-weight: bold;
+			margin-bottom: 0.5rem;
+		}
+
+		.stat-label {
+			color: #666;
+			font-size: 0.9rem;
+		}
+
+		.stat-pendiente .stat-number {
+			color: var(--warning-color);
+		}
+
+		.stat-proceso .stat-number {
+			color: var(--highlight-color);
+		}
+
+		.stat-resuelto .stat-number {
+			color: var(--success-color);
+		}
+
+		.stat-escalado .stat-number {
+			color: var(--danger-color);
+		}
+
+		.filters-section {
+			background: white;
+			padding: 1.5rem;
+			border-radius: 10px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			margin-bottom: 2rem;
+		}
+
+		.filters-title {
+			margin-bottom: 1rem;
+			color: var(--secondary-color);
+		}
+
+		.filters-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 1rem;
+		}
+
+		.filter-group {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.filter-label {
+			margin-bottom: 0.5rem;
+			font-weight: 500;
+			color: var(--text-color);
+		}
+
+		select,
+		input {
+			padding: 0.75rem;
+			border: 2px solid #ddd;
+			border-radius: 8px;
+			font-size: 1rem;
+			transition: border-color 0.3s ease;
+		}
+
+		select:focus,
+		input:focus {
+			outline: none;
+			border-color: var(--primary-color);
+		}
+
+		.filter-buttons {
+			display: flex;
+			gap: 1rem;
+			align-items: end;
+		}
+
+		.btn {
+			padding: 0.75rem 1.5rem;
+			border: none;
+			border-radius: 8px;
+			font-size: 1rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			text-decoration: none;
+			display: inline-block;
+			text-align: center;
+		}
+
+		.btn-primary {
+			background-color: var(--primary-color);
+			color: white;
+		}
+
+		.btn-primary:hover {
+			background-color: #138f66;
+			transform: translateY(-2px);
+		}
+
+		.btn-secondary {
+			background-color: #6c757d;
+			color: white;
+		}
+
+		.btn-secondary:hover {
+			background-color: #5a6268;
+		}
+
+		.tickets-section {
+			background: white;
+			border-radius: 10px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			overflow: hidden;
+		}
+
+		.tickets-header {
+			background: var(--primary-color);
+			color: white;
+			padding: 1rem 1.5rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.tickets-title {
+			font-size: 1.2rem;
+			font-weight: 500;
+		}
+
+		.tickets-count {
+			background: rgba(255, 255, 255, 0.2);
+			padding: 0.25rem 0.75rem;
+			border-radius: 20px;
+			font-size: 0.9rem;
+		}
+
+		.tickets-table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		.tickets-table th,
+		.tickets-table td {
+			padding: 1rem;
+			text-align: left;
+			border-bottom: 1px solid #eee;
+		}
+
+		.tickets-table th {
+			background-color: #f8f9fa;
+			font-weight: 600;
+			color: var(--secondary-color);
+		}
+
+		.tickets-table tr:hover {
+			background-color: #f8f9fa;
+		}
+
+		.priority-badge,
+		.status-badge,
+		.category-badge {
+			padding: 0.25rem 0.75rem;
+			border-radius: 20px;
+			font-size: 0.8rem;
+			font-weight: 500;
+		}
+
+		.priority-alta {
+			background-color: #ffebee;
+			color: #c62828;
+		}
+
+		.priority-media {
+			background-color: #fff3e0;
+			color: #e65100;
+		}
+
+		.priority-baja {
+			background-color: #e8f5e8;
+			color: #2e7d32;
+		}
+
+		.status-pendiente {
+			background-color: #fff3cd;
+			color: #856404;
+		}
+
+		.status-en-proceso {
+			background-color: #d1ecf1;
+			color: #0c5460;
+		}
+
+		.status-resuelto {
+			background-color: #d4edda;
+			color: #155724;
+		}
+
+		.status-escalado {
+			background-color: #f8d7da;
+			color: #721c24;
+		}
+
+		.category-badge {
+			background-color: var(--primary-color);
+			color: white;
+		}
+
+		.action-buttons {
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.btn-small {
+			padding: 0.5rem 1rem;
+			font-size: 0.85rem;
+		}
+
+		.btn-resolve {
+			background-color: var(--success-color);
+			color: white;
+		}
+
+		.btn-resolve:hover {
+			background-color: #218838;
+		}
+
+		.btn-view {
+			background-color: var(--highlight-color);
+			color: white;
+		}
+
+		.btn-view:hover {
+			background-color: #0ea8b5;
+		}
+
+		.loading {
+			text-align: center;
+			padding: 3rem;
+			color: #666;
+		}
+
+		.no-tickets {
+			text-align: center;
+			padding: 3rem;
+			color: #666;
+			font-style: italic;
+		}
+
+		.error {
+			background-color: #f8d7da;
+			color: #721c24;
+			padding: 1rem;
+			border-radius: 8px;
+			margin: 1rem 0;
+			text-align: center;
+		}
+
+		.user-info {
+			font-size: 0.9rem;
+			color: #666;
+		}
+
+		.ticket-date {
+			font-size: 0.9rem;
+			color: #666;
+		}
+
+		@media (max-width: 768px) {
+			.header-content {
+				flex-direction: column;
+				gap: 1rem;
+			}
+
+			.filters-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.filter-buttons {
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			.tickets-table {
+				font-size: 0.9rem;
+			}
+
+			.tickets-table th,
+			.tickets-table td {
+				padding: 0.5rem;
+			}
+
+			.action-buttons {
+				flex-direction: column;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="header">
+		<div class="header-content">
+			<img
+				src="https://imgs.search.brave.com/6UqI_wisZKzgwoye0pTp0QUoyrtCN3zs4PDPRvQcE2o/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly91dGMt/bWF4Lm14L3N0YXRp/Yy9pbWdzL2xvZ29z/L2xvZ29fdXRjLnBu/Zw"
+				alt="UTC" class="logo">
+			<div class="admin-info">
+				<div class="admin-avatar" id="adminAvatar">AD</div>
+				<div>
+					<div><strong id="adminName">Administrador</strong></div>
+					<div style="font-size: 0.9rem; opacity: 0.8;">Panel de Validación</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="main-container">
+		<div class="page-header">
+			<h1 class="page-title">Validación de Tickets</h1>
+			<p class="page-subtitle">Gestiona y resuelve las quejas y sugerencias de los estudiantes</p>
+		</div>
+
+		<div class="stats-section" id="statsSection">
+			<div class="stat-card stat-pendiente">
+				<div class="stat-number" id="statPendiente">0</div>
+				<div class="stat-label">Pendientes</div>
+			</div>
+			<div class="stat-card stat-proceso">
+				<div class="stat-number" id="statProceso">0</div>
+				<div class="stat-label">En Proceso</div>
+			</div>
+			<div class="stat-card stat-resuelto">
+				<div class="stat-number" id="statResuelto">0</div>
+				<div class="stat-label">Resueltos</div>
+			</div>
+			<div class="stat-card stat-escalado">
+				<div class="stat-number" id="statEscalado">0</div>
+				<div class="stat-label">Escalados</div>
+			</div>
+		</div>
+
+		<div class="filters-section">
+			<h3 class="filters-title">Filtros de Búsqueda</h3>
+			<div class="filters-grid">
+				<div class="filter-group">
+					<label class="filter-label">Estado</label>
+					<select id="statusFilter">
+						<option value="">Todos los estados</option>
+						<option value="pendiente">Pendiente</option>
+						<option value="en-proceso">En Proceso</option>
+						<option value="resuelto">Resuelto</option>
+						<option value="escalado">Escalado</option>
+					</select>
+				</div>
+				<div class="filter-group">
+					<label class="filter-label">Categoría</label>
+					<select id="categoryFilter">
+						<option value="">Todas las categorías</option>
+						<option value="servicios-academicos">Servicios Académicos</option>
+						<option value="infraestructura">Infraestructura</option>
+						<option value="cafeteria">Cafetería</option>
+						<option value="biblioteca">Biblioteca</option>
+						<option value="tecnologia">Tecnología</option>
+						<option value="administrativo">Administrativo</option>
+						<option value="servicios-estudiantiles">Servicios Estudiantiles</option>
+					</select>
+				</div>
+				<div class="filter-group">
+					<label class="filter-label">Prioridad</label>
+					<select id="priorityFilter">
+						<option value="">Todas las prioridades</option>
+						<option value="alta">Alta</option>
+						<option value="media">Media</option>
+						<option value="baja">Baja</option>
+					</select>
+				</div>
+				<div class="filter-buttons">
+					<button class="btn btn-primary" onclick="applyFilters()">Aplicar Filtros</button>
+					<button class="btn btn-secondary" onclick="clearFilters()">Limpiar</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="tickets-section">
+			<div class="tickets-header">
+				<h3 class="tickets-title">Lista de Tickets</h3>
+				<span class="tickets-count" id="ticketsCount">0 tickets</span>
+			</div>
+			<div id="ticketsContainer">
+				<div class="loading">
+					<p>Cargando tickets...</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		let allTickets = [];
+		let filteredTickets = [];
+
+		document.addEventListener('DOMContentLoaded', function () {
+			console.log('DOM loaded, initializing...');
+			checkAdminSession();
+			loadTickets();
+			loadStats();
+		});
+
+		async function checkAdminSession() {
+			try {
+				console.log('Checking admin session...');
+				const response = await fetch('/check-session');
+				const data = await response.json();
+
+				console.log('Session data:', data);
+
+				if (!data.authenticated || data.user.role !== 'admin') {
+					console.log('Not authenticated or not admin, redirecting...');
+					window.location.href = '/auth';
+					return;
+				}
+
+				document.getElementById('adminName').textContent = data.user.name;
+				const initials = data.user.name.substring(0, 2).toUpperCase();
+				document.getElementById('adminAvatar').textContent = initials;
+
+			} catch (error) {
+				console.error('Error checking session:', error);
+				window.location.href = '/auth';
+			}
+		}
+
+		async function loadTickets() {
+			const container = document.getElementById('ticketsContainer');
+
+			try {
+				console.log('Loading tickets...');
+				container.innerHTML = '<div class="loading"><p>Cargando tickets...</p></div>';
+
+				const response = await fetch('/api/tickets');
+				console.log('Response status:', response.status);
+
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+
+				const data = await response.json();
+				console.log('Tickets data:', data);
+
+				if (data.success) {
+					allTickets = data.tickets;
+					filteredTickets = [...allTickets];
+					console.log(`Loaded ${allTickets.length} tickets`);
+					displayTickets(filteredTickets);
+					updateTicketsCount(filteredTickets.length);
+				} else {
+					throw new Error(data.error || 'Error desconocido');
+				}
+			} catch (error) {
+				console.error('Error loading tickets:', error);
+				container.innerHTML = `
+					<div class="error">
+						<p>❌ Error al cargar los tickets: ${error.message}</p>
+						<button onclick="loadTickets()" class="btn btn-primary" style="margin-top: 10px;">Reintentar</button>
+					</div>
+				`;
+			}
+		}
+
+		async function loadStats() {
+			try {
+				console.log('Loading stats...');
+				const response = await fetch('/api/tickets/stats');
+
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+
+				const data = await response.json();
+				console.log('Stats data:', data);
+
+				if (data.success) {
+					const stats = data.stats;
+					document.getElementById('statPendiente').textContent = stats.by_status.pendiente || 0;
+					document.getElementById('statProceso').textContent = stats.by_status['en-proceso'] || 0;
+					document.getElementById('statResuelto').textContent = stats.by_status.resuelto || 0;
+					document.getElementById('statEscalado').textContent = stats.by_status.escalado || 0;
+				}
+			} catch (error) {
+				console.error('Error loading stats:', error);
+			}
+		}
+
+		function displayTickets(tickets) {
+			const container = document.getElementById('ticketsContainer');
+			console.log(`Displaying ${tickets.length} tickets`);
+
+			if (tickets.length === 0) {
+				container.innerHTML = `
+					<div class="no-tickets">
+						<p>No hay tickets que mostrar con los filtros actuales.</p>
+					</div>
+				`;
+				return;
+			}
+
+			const tableHTML = `
+				<table class="tickets-table">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Fecha</th>
+							<th>Estudiante</th>
+							<th>Asunto</th>
+							<th>Categoría</th>
+							<th>Prioridad</th>
+							<th>Estado</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						${tickets.map(ticket => `
+							<tr>
+								<td>#${ticket.id}</td>
+								<td class="ticket-date">${formatDate(ticket.date)}</td>
+								<td class="user-info">
+									<strong>${ticket.user.name} ${ticket.user.last_name}</strong>
+								</td>
+								<td>
+									<strong>${ticket.title}</strong>
+									<div style="font-size: 0.8rem; color: #666; margin-top: 0.25rem;">
+										${ticket.content.substring(0, 80)}${ticket.content.length > 80 ? '...' : ''}
+									</div>
+								</td>
+								<td><span class="category-badge">${ticket.categoryName}</span></td>
+								<td><span class="priority-badge priority-${ticket.priority}">${getPriorityText(ticket.priority)}</span></td>
+								<td><span class="status-badge status-${ticket.status}">${getStatusText(ticket.status)}</span></td>
+								<td>
+									<div class="action-buttons">
+										<a href="/ticket/${ticket.id}" class="btn btn-small btn-resolve">Resolver</a>
+									</div>
+								</td>
+							</tr>
+						`).join('')}
+					</tbody>
+				</table>
+			`;
+
+			container.innerHTML = tableHTML;
+		}
+
+		function applyFilters() {
+			console.log('Applying filters...');
+			const statusFilter = document.getElementById('statusFilter').value;
+			const categoryFilter = document.getElementById('categoryFilter').value;
+			const priorityFilter = document.getElementById('priorityFilter').value;
+
+			console.log('Filters:', {statusFilter, categoryFilter, priorityFilter});
+
+			filteredTickets = allTickets.filter(ticket => {
+				const matchesStatus = !statusFilter || ticket.status === statusFilter;
+				const matchesCategory = !categoryFilter || ticket.category === categoryFilter;
+				const matchesPriority = !priorityFilter || ticket.priority === priorityFilter;
+
+				return matchesStatus && matchesCategory && matchesPriority;
+			});
+
+			console.log(`Filtered to ${filteredTickets.length} tickets`);
+			displayTickets(filteredTickets);
+			updateTicketsCount(filteredTickets.length);
+		}
+
+		function clearFilters() {
+			console.log('Clearing filters...');
+			document.getElementById('statusFilter').value = '';
+			document.getElementById('categoryFilter').value = '';
+			document.getElementById('priorityFilter').value = '';
+
+			filteredTickets = [...allTickets];
+			displayTickets(filteredTickets);
+			updateTicketsCount(filteredTickets.length);
+		}
+
+		function updateTicketsCount(count) {
+			document.getElementById('ticketsCount').textContent = `${count} ticket${count !== 1 ? 's' : ''}`;
+		}
+
+		function formatDate(dateString) {
+			try {
+				const date = new Date(dateString);
+				return date.toLocaleDateString('es-ES', {
+					year: 'numeric',
+					month: '2-digit',
+					day: '2-digit'
+				});
+			} catch (error) {
+				return dateString;
+			}
+		}
+
+		function getPriorityText(priority) {
+			const priorities = {
+				'alta': 'Alta',
+				'media': 'Media',
+				'baja': 'Baja'
+			};
+			return priorities[priority] || priority;
+		}
+
+		function getStatusText(status) {
+			const statuses = {
+				'pendiente': 'Pendiente',
+				'en-proceso': 'En Proceso',
+				'resuelto': 'Resuelto',
+				'escalado': 'Escalado'
+			};
+			return statuses[status] || status;
+		}
+	</script>
+
+	<!-- Añadir este script al final del archivo ticket.html -->
+	<script>
+		async function resolveTicket(ticketId) {
+			try {
+				const response = await fetch(`/api/tickets/${ticketId}/resolve`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						assigned_to: document.getElementById('assignedTo').value,
+						admin_response: document.getElementById('adminResponse').value,
+						status: document.getElementById('statusSelect').value,
+						resolution_date: document.getElementById('resolutionDate').value,
+						time_spent: document.getElementById('timeSpent').value,
+						follow_up_required: document.getElementById('followUpRequired').checked,
+						follow_up_date: document.getElementById('followUpDate').value,
+						internal_notes: document.getElementById('internalNotes').value
+					})
+				});
+
+				const data = await response.json();
+
+				if (data.success) {
+					alert('Ticket resuelto exitosamente');
+					window.location.href = '/ticket';
+				} else {
+					alert(`Error: ${data.message}`);
+				}
+			} catch (error) {
+				console.error('Error:', error);
+				alert('Error al resolver el ticket');
+			}
+		}
+
+		// Función para cargar los datos del ticket
+		async function loadTicketData(ticketId) {
+			try {
+				const response = await fetch(`/api/tickets/${ticketId}`);
+				const data = await response.json();
+
+				if (data.success) {
+					const ticket = data.ticket;
+
+					// Llenar los campos del formulario
+					document.getElementById('ticketTitle').textContent = ticket.title;
+					document.getElementById('ticketContent').textContent = ticket.content;
+					document.getElementById('ticketCategory').textContent = ticket.categoryName;
+					document.getElementById('ticketPriority').textContent = getPriorityText(ticket.priority);
+					document.getElementById('ticketStatus').textContent = getStatusText(ticket.status);
+					document.getElementById('ticketDate').textContent = formatDate(ticket.date);
+					document.getElementById('userName').textContent = `${ticket.user.name} ${ticket.user.last_name}`;
+					document.getElementById('userEmail').textContent = ticket.user.email;
+
+					// Si hay respuesta previa, llenar los campos
+					if (ticket.response) {
+						document.getElementById('assignedTo').value = ticket.response.assigned_to || '';
+						document.getElementById('adminResponse').value = ticket.response.admin_response || '';
+						document.getElementById('statusSelect').value = ticket.status;
+						document.getElementById('resolutionDate').value = ticket.response.resolution_date || '';
+						document.getElementById('timeSpent').value = ticket.response.time_spent || '';
+						document.getElementById('followUpRequired').checked = ticket.response.follow_up_required || false;
+						document.getElementById('followUpDate').value = ticket.response.follow_up_date || '';
+						document.getElementById('internalNotes').value = ticket.response.internal_notes || '';
+					}
+				}
+			} catch (error) {
+				console.error('Error loading ticket data:', error);
+			}
+		}
+
+		// Cargar los datos cuando la página esté lista
+		document.addEventListener('DOMContentLoaded', function () {
+			const urlParts = window.location.pathname.split('/');
+			const ticketId = urlParts[urlParts.length - 1];
+
+			if (ticketId && !isNaN(ticketId)) {
+				loadTicketData(parseInt(ticketId));
+			}
+		});
+	</script>
+</body>
+
+</html>
