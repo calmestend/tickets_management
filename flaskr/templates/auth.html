@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0">
-	<title>Auth</title>
+	<title>Iniciar Sesión - UTC</title>
 	<style>
 		body {
 			background: linear-gradient(120deg, #0FB59F, #0B8BBC, #F2F2F2, #17A67D);
@@ -18,12 +18,12 @@
 		@keyframes gradientBG {
 
 			0%,
-			800% {
-				background-position: 0% 100%
+			100% {
+				background-position: 0% 50%;
 			}
 
-			400% {
-				background-position: 7500% 30%
+			50% {
+				background-position: 100% 50%;
 			}
 		}
 
@@ -112,20 +112,9 @@
 			color: #FFD700;
 		}
 
-		.toggle {
-			background: none;
-			color: #0F8A68;
-			border: none;
-			cursor: pointer;
-			text-decoration: underline;
-			font-size: 14px;
-			margin-top: 8px;
-			padding: 8px 0 0;
-			transition: color .2s;
-		}
-
-		.toggle:hover {
-			color: #0B8BBC;
+		button[type="submit"]:disabled {
+			background: #ccc;
+			cursor: not-allowed;
 		}
 
 		input::placeholder {
@@ -136,6 +125,46 @@
 		.panel:hover {
 			box-shadow: 0 8px 32px #0FB59F33;
 			border-color: #17A67D;
+		}
+
+		.message {
+			margin: 10px 0;
+			padding: 10px;
+			border-radius: 5px;
+			font-size: 14px;
+		}
+
+		.error {
+			background-color: #fee;
+			color: #c33;
+			border: 1px solid #fcc;
+		}
+
+		.success {
+			background-color: #efe;
+			color: #3c3;
+			border: 1px solid #cfc;
+		}
+
+		.credentials-info {
+			background: #f0f8ff;
+			border: 1px solid #0B8BBC;
+			border-radius: 8px;
+			padding: 15px;
+			margin: 20px 0;
+			font-size: 13px;
+			text-align: left;
+		}
+
+		.credentials-info h4 {
+			margin: 0 0 10px 0;
+			color: #17A67D;
+			text-align: center;
+		}
+
+		.credentials-info div {
+			margin: 5px 0;
+			font-family: monospace;
 		}
 	</style>
 </head>
@@ -148,42 +177,71 @@
 	</div>
 	<div class="panel">
 		<div class="decoration"></div>
-		<h2 id="panel-title">Iniciar Sesión</h2>
+		<h2>Iniciar Sesión</h2>
+
+		<div id="message" class="message" style="display: none;"></div>
+
 		<form id="login-form">
-			<input type="text" placeholder="Usuario o Email" required>
-			<input type="password" placeholder="Contraseña" required>
-			<button type="submit">Entrar</button>
+			<input type="email" id="email" name="email" placeholder="Email institucional" required>
+			<input type="password" id="password" name="password" placeholder="Contraseña" required>
+			<button type="submit" id="login-btn">Entrar</button>
 		</form>
-		<form id="register-form" style="display:none">
-			<input type="text" placeholder="Usuario" required>
-			<input type="email" placeholder="Email" required>
-			<input type="password" placeholder="Contraseña" required>
-			<button type="submit">Registrarse</button>
-		</form>
-		<button class="toggle" onclick="togglePanel()">¿No tienes cuenta? Regístrate</button>
 	</div>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			const form = document.getElementById('login-form');
+			const loginBtn = document.getElementById('login-btn');
+			const messageDiv = document.getElementById('message');
+
+			form.addEventListener('submit', async function (e) {
+				e.preventDefault();
+
+				loginBtn.disabled = true;
+				loginBtn.textContent = 'Iniciando...';
+
+				const email = document.getElementById('email').value.trim().toLowerCase();
+				const password = document.getElementById('password').value;
+
+				try {
+					const response = await fetch('/login', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({email, password})
+					});
+
+					const result = await response.json();
+
+					if (result.success) {
+						showMessage(result.message, 'success');
+						console.log("Redirigiendo a:", result.redirect);
+
+						setTimeout(() => {
+							window.location.href = result.redirect;
+						}, 1000);
+					} else {
+						showMessage(result.message, 'error');
+						loginBtn.disabled = false;
+						loginBtn.textContent = 'Entrar';
+					}
+				} catch (error) {
+					console.error("Error en el login:", error);
+					showMessage("Error de conexión. Intenta de nuevo.", 'error');
+					loginBtn.disabled = false;
+					loginBtn.textContent = 'Entrar';
+				}
+			});
+
+			function showMessage(msg, type) {
+				messageDiv.className = `message ${type}`;
+				messageDiv.textContent = msg;
+				messageDiv.style.display = 'block';
+			}
+		});
+	</script>
+
 </body>
-<script>
-	function togglePanel() {
-		const loginForm = document.getElementById('login-form');
-		const registerForm = document.getElementById('register-form');
-		const panelTitle = document.getElementById('panel-title');
-		const toggleBtn = document.querySelector('.toggle');
-
-		const isLoginVisible = loginForm.style.display !== 'none';
-
-		if (isLoginVisible) {
-			loginForm.style.display = 'none';
-			registerForm.style.display = 'block';
-			panelTitle.textContent = 'Registrarse';
-			toggleBtn.textContent = '¿Ya tienes cuenta? Inicia sesión';
-		} else {
-			loginForm.style.display = 'block';
-			registerForm.style.display = 'none';
-			panelTitle.textContent = 'Iniciar Sesión';
-			toggleBtn.textContent = '¿No tienes cuenta? Regístrate';
-		}
-	}
-</script>
 
 </html>

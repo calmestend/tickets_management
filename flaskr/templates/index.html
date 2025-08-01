@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Tu Voz Importa - Tickets</title>
+	<title>Tu Voz Importa - UTC</title>
 	<style>
 		:root {
 			--primary-color: #17A67D;
@@ -45,6 +45,49 @@
 		.subtitle {
 			font-style: italic;
 			margin-top: 5px;
+		}
+
+		.nav-section {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin: 20px 0;
+		}
+
+		.login-btn {
+			background-color: var(--highlight-color);
+			color: white;
+			padding: 10px 20px;
+			border-radius: 25px;
+			text-decoration: none;
+			font-weight: bold;
+			transition: all 0.3s ease;
+			border: none;
+			cursor: pointer;
+		}
+
+		.login-btn:hover {
+			background-color: var(--primary-color);
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+		}
+
+		.login-btn.primary {
+			background-color: var(--primary-color);
+		}
+
+		.login-btn.secondary {
+			background-color: var(--secondary-color);
+		}
+
+		.login-btn.logout {
+			background-color: #dc3545;
+		}
+
+		.login-btn.logout:hover {
+			background-color: #c82333;
 		}
 
 		.ticket-container {
@@ -110,19 +153,24 @@
 			font-weight: bold;
 		}
 
-		.status-pending {
+		.status-pendiente {
 			background-color: #FFF3CD;
 			color: #856404;
 		}
 
-		.status-in-progress {
+		.status-en-proceso {
 			background-color: #D1ECF1;
 			color: #0C5460;
 		}
 
-		.status-resolved {
+		.status-resuelto {
 			background-color: #D4EDDA;
 			color: #155724;
+		}
+
+		.status-escalado {
+			background-color: #F8D7DA;
+			color: #721C24;
 		}
 
 		.filter-section {
@@ -163,18 +211,38 @@
 			grid-column: 1 / -1;
 		}
 
-		.login-btn {
-			background-color: var(--highlight-color);
-			color: white;
-			padding: 10px 20px;
-			border-radius: 25px;
-			text-decoration: none;
-			font-weight: bold;
-			transition: background-color 0.3s ease;
+		.user-info {
+			background-color: white;
+			padding: 10px 15px;
+			border-radius: 20px;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			font-size: 0.9rem;
 		}
 
-		.login-btn:hover {
+		.user-avatar {
 			background-color: var(--primary-color);
+			color: white;
+			width: 30px;
+			height: 30px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: bold;
+			font-size: 0.8rem;
+		}
+
+		@media (max-width: 768px) {
+			.nav-section {
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			.login-btn {
+				text-align: center;
+			}
 		}
 	</style>
 </head>
@@ -187,52 +255,212 @@
 		</div>
 	</header>
 
-	<div class="container" style="display:flex; justify-content: space-between;">
-		<a href="/post" class="login-btn">Tengo una queja o sugerencia</a>
-		<a href="/profile" class="login-btn">Mi Perfil</a>
-		<a href="/auth" class="login-btn">Iniciar sesión</a>
-		<a href="/logout" class="login-btn">Cerrar sesion</a>
+	<div class="container">
+		<div class="nav-section" id="navigation">
+			<!-- El contenido se cargará dinámicamente -->
+		</div>
 	</div>
-
 
 	<main class="container">
 		<div class="filter-section">
 			<h3>Filtrar por categoría:</h3>
 			<div class="filter-options">
-				<button class="filter-btn active">Todos</button>
-				<button class="filter-btn">Protección</button>
-				<button class="filter-btn">Recursos Humanos</button>
-				<button class="filter-btn">Cafeterías</button>
-				<button class="filter-btn">Instalaciones</button>
-				<button class="filter-btn">Dirección Académica</button>
-				<button class="filter-btn">Eventos</button>
-				<button class="filter-btn">Servicios Escolares</button>
+				<button class="filter-btn active" data-filter="todos">Todos</button>
+				<button class="filter-btn" data-filter="servicios-academicos">Servicios Académicos</button>
+				<button class="filter-btn" data-filter="infraestructura">Infraestructura</button>
+				<button class="filter-btn" data-filter="cafeteria">Cafetería</button>
+				<button class="filter-btn" data-filter="biblioteca">Biblioteca</button>
+				<button class="filter-btn" data-filter="tecnologia">Tecnología</button>
+				<button class="filter-btn" data-filter="administrativo">Administrativo</button>
+				<button class="filter-btn" data-filter="servicios-estudiantiles">Servicios Estudiantiles</button>
 			</div>
 		</div>
 
-		<div class="ticket-container">
-			<!-- Ticket 1 -->
-			<div class="ticket-card">
-				<div class="ticket-header">
-					<span class="ticket-category">Cafeterías</span>
-					<span class="ticket-date">14/07/2025</span>
-				</div>
-				<h3 class="ticket-title">Falta de variedad en el menú</h3>
-				<p class="ticket-content">Desde hace varias semanas noto que las opciones en la cafetería principal son muy
-					limitadas y se repiten constantemente. Sería bueno tener más variedad de alimentos saludables.</p>
-				<span class="ticket-status status-in-progress">En progreso</span>
+		<div class="ticket-container" id="ticketsContainer">
+			<div class="no-tickets">
+				<p>Cargando tickets...</p>
 			</div>
 		</div>
 	</main>
 
 	<script>
-		// Simple filter functionality
+		let allTickets = [];
+		let currentFilter = 'todos';
+
+		// Verificar sesión al cargar
+		document.addEventListener('DOMContentLoaded', function () {
+			checkSession();
+			loadTickets();
+		});
+
+		async function checkSession() {
+			try {
+				const response = await fetch('/check-session');
+				const data = await response.json();
+
+				const navigation = document.getElementById('navigation');
+
+				if (data.authenticated) {
+					navigation.innerHTML = `
+		<div class="user-info">
+			<div class="user-avatar">
+				${data.user.name[0]}${data.user.name.split(' ')[1] ? data.user.name.split(' ')[1][0] : ''}
+			</div>
+			<span>Hola, ${data.user.name}</span>
+		</div>
+		<div style="display: flex; gap: 10px; flex-wrap: wrap;">
+			${data.user.role === 'admin' ? '<a href="/ticket" class="login-btn primary">Validar Tickets</a>' : '<a href="/post" class="login-btn primary">Nueva queja/sugerencia</a>'}
+			${data.user.role === 'admin' ? '' : '<a href="/profile" class="login-btn">Mi Perfil</a>'}
+			${data.user.role === 'admin' ? '<a href="/admin-dashboard" class="login-btn">Panel Admin</a>' : ''}
+			<a href="/logout" class="login-btn logout">Cerrar Sesión</a>
+		</div>
+	`;
+				} else {
+					navigation.innerHTML = `
+		<div style="display: flex; gap: 10px; flex-wrap: wrap; width: 100%; justify-content: center;">
+			<a href="/auth" class="login-btn primary">Iniciar Sesión</a>
+		</div>
+	`;
+				}
+
+			} catch (error) {
+				console.error('Error checking session:', error);
+				// Mostrar opciones de invitado
+				const navigation = document.getElementById('navigation');
+				navigation.innerHTML = `
+					<div style="display: flex; gap: 10px; flex-wrap: wrap; width: 100%; justify-content: center;">
+						<a href="/auth" class="login-btn primary">Iniciar Sesión</a>
+					</div>
+				`;
+			}
+		}
+
+		async function loadTickets() {
+			try {
+				// Simulamos carga de tickets - en implementación real vendría del backend
+				const sampleTickets = [
+					{
+						id: 1,
+						category: 'cafeteria',
+						categoryName: 'Cafetería',
+						date: '2025-07-25',
+						title: 'Falta de variedad en el menú',
+						content: 'Desde hace varias semanas noto que las opciones en la cafetería principal son muy limitadas y se repiten constantemente. Sería bueno tener más variedad de alimentos saludables.',
+						status: 'en-proceso'
+					},
+					{
+						id: 2,
+						category: 'infraestructura',
+						categoryName: 'Infraestructura',
+						date: '2025-07-24',
+						title: 'Aire acondicionado en aula B-203',
+						content: 'El aire acondicionado del aula B-203 no funciona correctamente, hace mucho calor durante las clases de la tarde.',
+						status: 'pendiente'
+					},
+					{
+						id: 3,
+						category: 'servicios-academicos',
+						categoryName: 'Servicios Académicos',
+						date: '2025-07-23',
+						title: 'Problema con inscripción a materias',
+						content: 'No he podido inscribirme a las materias optativas del semestre debido a problemas técnicos en el sistema.',
+						status: 'resuelto'
+					},
+					{
+						id: 4,
+						category: 'biblioteca',
+						categoryName: 'Biblioteca',
+						date: '2025-07-22',
+						title: 'Horarios de biblioteca',
+						content: 'Sugiero extender los horarios de la biblioteca durante época de exámenes finales.',
+						status: 'pendiente'
+					},
+					{
+						id: 5,
+						category: 'tecnologia',
+						categoryName: 'Tecnología',
+						date: '2025-07-21',
+						title: 'WiFi lento en laboratorios',
+						content: 'La conexión a internet en los laboratorios de computación es muy lenta, afecta las clases prácticas.',
+						status: 'escalado'
+					}
+				];
+
+				allTickets = sampleTickets;
+				displayTickets(allTickets);
+			} catch (error) {
+				console.error('Error loading tickets:', error);
+				document.getElementById('ticketsContainer').innerHTML = `
+					<div class="no-tickets">
+						<p>Error al cargar los tickets. Inténtalo de nuevo más tarde.</p>
+					</div>
+				`;
+			}
+		}
+
+		function displayTickets(tickets) {
+			const container = document.getElementById('ticketsContainer');
+
+			if (tickets.length === 0) {
+				container.innerHTML = `
+					<div class="no-tickets">
+						<p>No hay tickets para mostrar${currentFilter !== 'todos' ? ' en esta categoría' : ''}.</p>
+					</div>
+				`;
+				return;
+			}
+
+			container.innerHTML = tickets.map(ticket => `
+				<div class="ticket-card">
+					<div class="ticket-header">
+						<span class="ticket-category">${ticket.categoryName}</span>
+						<span class="ticket-date">${formatDate(ticket.date)}</span>
+					</div>
+					<h3 class="ticket-title">${ticket.title}</h3>
+					<p class="ticket-content">${ticket.content}</p>
+					<span class="ticket-status status-${ticket.status}">${getStatusText(ticket.status)}</span>
+				</div>
+			`).join('');
+		}
+
+		function formatDate(dateString) {
+			const date = new Date(dateString);
+			return date.toLocaleDateString('es-ES', {
+				day: '2-digit',
+				month: '2-digit',
+				year: 'numeric'
+			});
+		}
+
+		function getStatusText(status) {
+			const statusMap = {
+				'pendiente': 'Pendiente',
+				'en-proceso': 'En progreso',
+				'resuelto': 'Resuelto',
+				'escalado': 'Escalado'
+			};
+			return statusMap[status] || status;
+		}
+
+		function filterTickets(category) {
+			currentFilter = category;
+
+			if (category === 'todos') {
+				displayTickets(allTickets);
+			} else {
+				const filtered = allTickets.filter(ticket => ticket.category === category);
+				displayTickets(filtered);
+			}
+		}
+
+		// Event listeners para filtros
 		document.querySelectorAll('.filter-btn').forEach(btn => {
 			btn.addEventListener('click', () => {
 				document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
 				btn.classList.add('active');
 
-				console.log(`Filtering by: ${btn.textContent}`);
+				const filter = btn.getAttribute('data-filter');
+				filterTickets(filter);
 			});
 		});
 	</script>

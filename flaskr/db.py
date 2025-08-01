@@ -75,7 +75,7 @@ def init_complaints():
         cur.execute(schema)
         conn.commit()
     except mariadb.Error as e:
-        print(f"Error creating compaints table: {e}")
+        print(f"Error creating complaints table: {e}")
         sys.exit(1)
 
 def init_complaint_responses():
@@ -99,28 +99,31 @@ def init_complaint_responses():
         cur.execute(schema)
         conn.commit()
     except mariadb.Error as e:
-        print(f"Error compaint_responsens table: {e}")
+        print(f"Error creating complaint_responses table: {e}")
         sys.exit(1)
 
 def create_indexes():
     indexes = [
-        "CREATE INDEX IF NOT EXISTS idx_complaints_user_id ON complaints(user_id);",
-        "CREATE INDEX IF NOT EXISTS idx_complaints_status ON complaints(status);",
-        "CREATE INDEX IF NOT EXISTS idx_complaints_created_at ON complaints(created_at);",
-        "CREATE INDEX IF NOT EXISTS idx_complaints_priority ON complaints(priority);",
-        "CREATE INDEX IF NOT EXISTS idx_complaints_category ON complaints(category);",
-        "CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);",
-        "CREATE INDEX IF NOT EXISTS idx_users_user_id ON users(user_id);",
-        "CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);"
+        "CREATE INDEX idx_complaints_user_id ON complaints(user_id);",
+        "CREATE INDEX idx_complaints_status ON complaints(status);",
+        "CREATE INDEX idx_complaints_created_at ON complaints(created_at);",
+        "CREATE INDEX idx_complaints_priority ON complaints(priority);",
+        "CREATE INDEX idx_complaints_category ON complaints(category);",
+        "CREATE INDEX idx_users_email ON users(email);",
+        "CREATE INDEX idx_users_user_id ON users(user_id);",
+        "CREATE INDEX idx_users_role ON users(role);"
     ]
     
-    try:
-        for index in indexes:
+    for index in indexes:
+        try:
             cur.execute(index)
-        conn.commit()
-        print("✅ Índices creados exitosamente")
-    except mariadb.Error as e:
-        print(f"❌ Error al crear índices: {e}")
+        except mariadb.Error as e:
+            if "Duplicate key name" in str(e):
+                print(f"ℹ️ Índice ya existe, se omite: {index.split()[2]}")
+            else:
+                print(f"❌ Error al crear índice: {e}")
+    conn.commit()
+    print("✅ Índices verificados/creados")
 
 def insert_sample_data():
     try:
@@ -184,122 +187,16 @@ def insert_sample_data():
         
         cur.execute(sample_complaint)
         conn.commit()
-        
     except mariadb.Error as e:
         print(f"Error inserting data: {e}")
-
 
 def initDB():
     init_users()
     init_complaints()
     init_complaint_responses()
-    
     create_indexes()
-    
     insert_sample_data()
 
-def get_user_by_email(email):
-    try:
-        cur.execute("SELECT * FROM users WHERE email = ?", (email,))
-        return cur.fetchone()
-    except mariadb.Error as e:
-        print(f"Error al obtener usuario: {e}")
-        return None
+if __name__ == "__main__":
+    initDB()
 
-def get_complaints_by_user(user_id):
-    try:
-        cur.execute("""
-            SELECT c.*, cr.admin_response, cr.resolution_date 
-            FROM complaints c 
-            LEFT JOIN complaint_responses cr ON c.id = cr.complaint_id 
-            WHERE c.user_id = ? 
-            ORDER BY c.created_at DESC
-        """, (user_id,))
-        return cur.fetchall()
-    except mariadb.Error as e:
-        print(f"Error al obtener quejas del usuario: {e}")
-        return []
-
-def get_pending_complaints():
-    try:
-        cur.execute("""
-            SELECT c.*, u.name, u.last_name, u.email 
-            FROM complaints c 
-            JOIN users u ON c.user_id = u.id 
-            WHERE c.status = 'pendiente' 
-            ORDER BY c.priority DESC, c.created_at ASC
-        """, )
-        return cur.fetchall()
-    except mariadb.Error as e:
-        print(f"Error al obtener quejas pendientes: {e}")
-        return []
-
-def create_complaint(user_id, complaint_data):
-    try:
-        query = """
-            INSERT INTO complaints (
-                user_id, complaint_type, category, priority, 
-                subject, description, incident_date, 
-                expected_resolution, previous_attempts
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """
-        cur.execute(query, (
-            user_id,
-            complaint_data['type'],
-            complaint_data['category'],
-            complaint_data['priority'],
-            complaint_data['subject'],
-            complaint_data['description'],
-            complaint_data.get('incident_date'),
-            complaint_data.get('expected_resolution'),
-            complaint_data.get('previous_attempts')
-        ))
-        conn.commit()
-        return cur.lastrowid
-    except mariadb.Error as e:
-        print(f"Error al crear queja: {e}")
-        return None
-
-def update_complaint_response(complaint_id, response_data):
-    try:
-        cur.execute("""
-            UPDATE complaints 
-            SET status = ?, updated_at = CURRENT_TIMESTAMP 
-            WHERE id = ?
-        """, (response_data['status'], complaint_id))
-        
-        query = """
-            INSERT INTO complaint_responses (
-                complaint_id, assigned_to, admin_response, 
-                resolution_date, time_spent, follow_up_required, 
-                follow_up_date, internal_notes
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-                assigned_to = VALUES(assigned_to),
-                admin_response = VALUES(admin_response),
-                resolution_date = VALUES(resolution_date),
-                time_spent = VALUES(time_spent),
-                follow_up_required = VALUES(follow_up_required),
-                follow_up_date = VALUES(follow_up_date),
-                internal_notes = VALUES(internal_notes),
-                updated_at = CURRENT_TIMESTAMP
-        """
-        
-        cur.execute(query, (
-            complaint_id,
-            response_data['assigned_to'],
-            response_data['admin_response'],
-            response_data.get('resolution_date'),
-            response_data.get('time_spent'),
-            response_data.get('follow_up_required', False),
-            response_data.get('follow_up_date'),
-            response_data.get('internal_notes')
-        ))
-        
-        conn.commit()
-        return True
-    except mariadb.Error as e:
-        print(f"Error al actualizar respuesta: {e}")
-        return False
-
-initDB()
