@@ -7,7 +7,7 @@ def get_db_connection():
             user="user",
             password="123",
             host="127.0.0.1",
-            port=3305,
+            port=3306,
             database="db"
         )
         return conn
@@ -81,7 +81,7 @@ def login():
             cur.close()
             conn.close()
         
-        redirect_url = "/admin-dashboard" if user[4] == "admin" else "/student-dashboard"
+        redirect_url = "/" if user[4] == "admin" else "/student-dashboard"
         
         return jsonify({
             "success": True,

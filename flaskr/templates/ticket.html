@@ -401,112 +401,17 @@
 
 			.tickets-table {
 				font-size: 0.9rem;
-			}
-
-			.tickets-table th,
-			.tickets-table td {
-				padding: 0.5rem;
-			}
-
-			.action-buttons {
-				flex-direction: column;
-			}
-		}
-	</style>
-</head>
-
-<body>
-	<div class="header">
-		<div class="header-content">
-			<img
-				src="https://imgs.search.brave.com/6UqI_wisZKzgwoye0pTp0QUoyrtCN3zs4PDPRvQcE2o/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly91dGMt/bWF4Lm14L3N0YXRp/Yy9pbWdzL2xvZ29z/L2xvZ29fdXRjLnBu/Zw"
-				alt="UTC" class="logo">
-			<div class="admin-info">
-				<div class="admin-avatar" id="adminAvatar">AD</div>
-				<div>
-					<div><strong id="adminName">Administrador</strong></div>
-					<div style="font-size: 0.9rem; opacity: 0.8;">Panel de Validación</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="main-container">
-		<div class="page-header">
-			<h1 class="page-title">Validación de Tickets</h1>
-			<p class="page-subtitle">Gestiona y resuelve las quejas y sugerencias de los estudiantes</p>
-		</div>
-
-		<div class="stats-section" id="statsSection">
-			<div class="stat-card stat-pendiente">
-				<div class="stat-number" id="statPendiente">0</div>
-				<div class="stat-label">Pendientes</div>
-			</div>
-			<div class="stat-card stat-proceso">
-				<div class="stat-number" id="statProceso">0</div>
-				<div class="stat-label">En Proceso</div>
-			</div>
-			<div class="stat-card stat-resuelto">
-				<div class="stat-number" id="statResuelto">0</div>
-				<div class="stat-label">Resueltos</div>
-			</div>
-			<div class="stat-card stat-escalado">
-				<div class="stat-number" id="statEscalado">0</div>
-				<div class="stat-label">Escalados</div>
-			</div>
-		</div>
-
-		<div class="filters-section">
-			<h3 class="filters-title">Filtros de Búsqueda</h3>
-			<div class="filters-grid">
-				<div class="filter-group">
-					<label class="filter-label">Estado</label>
-					<select id="statusFilter">
-						<option value="">Todos los estados</option>
-						<option value="pendiente">Pendiente</option>
-						<option value="en-proceso">En Proceso</option>
-						<option value="resuelto">Resuelto</option>
-						<option value="escalado">Escalado</option>
-					</select>
-				</div>
-				<div class="filter-group">
-					<label class="filter-label">Categoría</label>
-					<select id="categoryFilter">
-						<option value="">Todas las categorías</option>
-						<option value="servicios-academicos">Servicios Académicos</option>
-						<option value="infraestructura">Infraestructura</option>
-						<option value="cafeteria">Cafetería</option>
-						<option value="biblioteca">Biblioteca</option>
-						<option value="tecnologia">Tecnología</option>
-						<option value="administrativo">Administrativo</option>
-						<option value="servicios-estudiantiles">Servicios Estudiantiles</option>
-					</select>
-				</div>
-				<div class="filter-group">
-					<label class="filter-label">Prioridad</label>
-					<select id="priorityFilter">
-						<option value="">Todas las prioridades</option>
-						<option value="alta">Alta</option>
-						<option value="media">Media</option>
-						<option value="baja">Baja</option>
-					</select>
-				</div>
-				<div class="filter-buttons">
-					<button class="btn btn-primary" onclick="applyFilters()">Aplicar Filtros</button>
-					<button class="btn btn-secondary" onclick="clearFilters()">Limpiar</button>
-				</div>
-			</div>
-		</div>
-
-		<div class="tickets-section">
-			<div class="tickets-header">
-				<h3 class="tickets-title">Lista de Tickets</h3>
+			} .tickets-table th, .tickets-table td { padding: 0.5rem; } .action-buttons { flex-direction: column; } } </style> </head> <body> <div class="header"> <div class="header-content"> <img src="https://imgs.search.brave.com/6UqI_wisZKzgwoye0pTp0QUoyrtCN3zs4PDPRvQcE2o/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly91dGMt/bWF4Lm14L3N0YXRp/Yy9pbWdzL2xvZ29z/L2xvZ29fdXRjLnBu/Zw" alt="UTC" class="logo"> <div class="admin-info"> <div class="admin-avatar" id="adminAvatar">AD</div> <div> <div><strong id="adminName">Administrador</strong></div> <div style="font-size: 0.9rem; opacity: 0.8;">Panel de Validación</div> </div> </div> </div> </div> <div class="main-container"> <div class="page-header"> <h1 class="page-title">Validación de Tickets</h1> <p class="page-subtitle">Gestiona y resuelve las quejas y sugerencias de los estudiantes</p> </div> <div class="stats-section" id="statsSection"> <div class="stat-card stat-pendiente"> <div class="stat-number" id="statPendiente">0</div> <div class="stat-label">Pendientes</div> </div> <div class="stat-card stat-proceso"> <div class="stat-number" id="statProceso">0</div> <div class="stat-label">En Proceso</div> </div> <div class="stat-card stat-resuelto"> <div class="stat-number" id="statResuelto">0</div> <div class="stat-label">Resueltos</div> </div> <div class="stat-card stat-escalado"> <div class="stat-number" id="statEscalado">0</div> <div class="stat-label">Escalados</div> </div> </div> <div class="filters-section"> <h3 class="filters-title">Filtros de Búsqueda</h3> <div class="filters-grid"> <div class="filter-group"> <label class="filter-label">Estado</label> <select id="statusFilter"> <option value="">Todos los estados</option> <option value="pendiente">Pendiente</option> <option value="en-proceso">En Proceso</option> <option value="resuelto">Resuelto</option> <option value="escalado">Escalado</option> </select> </div> <div class="filter-group"> <label class="filter-label">Categoría</label> <select id="categoryFilter"> <option value="">Todas las categorías</option> <option value="servicios-academicos">Servicios Académicos</option> <option value="infraestructura">Infraestructura</option> <option value="cafeteria">Cafetería</option> <option value="biblioteca">Biblioteca</option> <option value="tecnologia">Tecnología</option> <option value="administrativo">Administrativo</option> <option value="servicios-estudiantiles">Servicios Estudiantiles</option> </select> </div> <div class="filter-group"> <label class="filter-label">Prioridad</label> <select id="priorityFilter"> <option value="">Todas las prioridades</option> <option value="alta">Alta</option> <option value="media">Media</option> <option value="baja">Baja</option> </select> </div> <div class="filter-buttons"> <button class="btn btn-primary" onclick="applyFilters()">Aplicar Filtros</button> <button class="btn btn-secondary" onclick="clearFilters()">Limpiar</button> </div> </div> </div> <div class="tickets-section"> <div class="tickets-header"> <h3 class="tickets-title">Lista de Tickets</h3>
 				<span class="tickets-count" id="ticketsCount">0 tickets</span>
 			</div>
 			<div id="ticketsContainer">
 				<div class="loading">
 					<p>Cargando tickets...</p>
 				</div>
+			<div>
+				
+				<button type="button" class="cancel-btn" onclick="history.back()">Cancelar</button>
+			</div>
 			</div>
 		</div>
 	</div>
