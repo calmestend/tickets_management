@@ -275,28 +275,12 @@
 			background-color: #f8f9fa;
 		}
 
-		.priority-badge,
 		.status-badge,
 		.category-badge {
 			padding: 0.25rem 0.75rem;
 			border-radius: 20px;
 			font-size: 0.8rem;
 			font-weight: 500;
-		}
-
-		.priority-alta {
-			background-color: #ffebee;
-			color: #c62828;
-		}
-
-		.priority-media {
-			background-color: #fff3e0;
-			color: #e65100;
-		}
-
-		.priority-baja {
-			background-color: #e8f5e8;
-			color: #2e7d32;
 		}
 
 		.status-pendiente {
@@ -401,17 +385,103 @@
 
 			.tickets-table {
 				font-size: 0.9rem;
-			} .tickets-table th, .tickets-table td { padding: 0.5rem; } .action-buttons { flex-direction: column; } } </style> </head> <body> <div class="header"> <div class="header-content"> <img src="https://imgs.search.brave.com/6UqI_wisZKzgwoye0pTp0QUoyrtCN3zs4PDPRvQcE2o/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly91dGMt/bWF4Lm14L3N0YXRp/Yy9pbWdzL2xvZ29z/L2xvZ29fdXRjLnBu/Zw" alt="UTC" class="logo"> <div class="admin-info"> <div class="admin-avatar" id="adminAvatar">AD</div> <div> <div><strong id="adminName">Administrador</strong></div> <div style="font-size: 0.9rem; opacity: 0.8;">Panel de Validación</div> </div> </div> </div> </div> <div class="main-container"> <div class="page-header"> <h1 class="page-title">Validación de Tickets</h1> <p class="page-subtitle">Gestiona y resuelve las quejas y sugerencias de los estudiantes</p> </div> <div class="stats-section" id="statsSection"> <div class="stat-card stat-pendiente"> <div class="stat-number" id="statPendiente">0</div> <div class="stat-label">Pendientes</div> </div> <div class="stat-card stat-proceso"> <div class="stat-number" id="statProceso">0</div> <div class="stat-label">En Proceso</div> </div> <div class="stat-card stat-resuelto"> <div class="stat-number" id="statResuelto">0</div> <div class="stat-label">Resueltos</div> </div> <div class="stat-card stat-escalado"> <div class="stat-number" id="statEscalado">0</div> <div class="stat-label">Escalados</div> </div> </div> <div class="filters-section"> <h3 class="filters-title">Filtros de Búsqueda</h3> <div class="filters-grid"> <div class="filter-group"> <label class="filter-label">Estado</label> <select id="statusFilter"> <option value="">Todos los estados</option> <option value="pendiente">Pendiente</option> <option value="en-proceso">En Proceso</option> <option value="resuelto">Resuelto</option> <option value="escalado">Escalado</option> </select> </div> <div class="filter-group"> <label class="filter-label">Categoría</label> <select id="categoryFilter"> <option value="">Todas las categorías</option> <option value="servicios-academicos">Servicios Académicos</option> <option value="infraestructura">Infraestructura</option> <option value="cafeteria">Cafetería</option> <option value="biblioteca">Biblioteca</option> <option value="tecnologia">Tecnología</option> <option value="administrativo">Administrativo</option> <option value="servicios-estudiantiles">Servicios Estudiantiles</option> </select> </div> <div class="filter-group"> <label class="filter-label">Prioridad</label> <select id="priorityFilter"> <option value="">Todas las prioridades</option> <option value="alta">Alta</option> <option value="media">Media</option> <option value="baja">Baja</option> </select> </div> <div class="filter-buttons"> <button class="btn btn-primary" onclick="applyFilters()">Aplicar Filtros</button> <button class="btn btn-secondary" onclick="clearFilters()">Limpiar</button> </div> </div> </div> <div class="tickets-section"> <div class="tickets-header"> <h3 class="tickets-title">Lista de Tickets</h3>
+			}
+
+			.tickets-table th,
+			.tickets-table td {
+				padding: 0.5rem;
+			}
+
+			.action-buttons {
+				flex-direction: column;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="header">
+		<div class="header-content">
+			<img
+				src="https://imgs.search.brave.com/6UqI_wisZKzgwoye0pTp0QUoyrtCN3zs4PDPRvQcE2o/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly91dGMt/bWF4Lm14L3N0YXRp/Yy9pbWdzL2xvZ29z/L2xvZ29fdXRjLnBu/Zw"
+				alt="UTC" class="logo">
+			<div class="admin-info">
+				<div class="admin-avatar" id="adminAvatar">AD</div>
+				<div>
+					<div><strong id="adminName">Administrador</strong></div>
+					<div style="font-size: 0.9rem; opacity: 0.8;">Panel de Validación</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="main-container">
+		<div class="page-header">
+			<h1 class="page-title">Validación de Tickets</h1>
+			<p class="page-subtitle">Gestiona y resuelve las quejas y sugerencias de los estudiantes</p>
+		</div>
+
+		<div class="stats-section" id="statsSection">
+			<div class="stat-card stat-pendiente">
+				<div class="stat-number" id="statPendiente">0</div>
+				<div class="stat-label">Pendientes</div>
+			</div>
+			<div class="stat-card stat-proceso">
+				<div class="stat-number" id="statProceso">0</div>
+				<div class="stat-label">En Proceso</div>
+			</div>
+			<div class="stat-card stat-resuelto">
+				<div class="stat-number" id="statResuelto">0</div>
+				<div class="stat-label">Resueltos</div>
+			</div>
+			<div class="stat-card stat-escalado">
+				<div class="stat-number" id="statEscalado">0</div>
+				<div class="stat-label">Escalados</div>
+			</div>
+		</div>
+
+		<div class="filters-section">
+			<h3 class="filters-title">Filtros de Búsqueda</h3>
+			<div class="filters-grid">
+				<div class="filter-group">
+					<label class="filter-label">Estado</label>
+					<select id="statusFilter">
+						<option value="">Todos los estados</option>
+						<option value="pendiente">Pendiente</option>
+						<option value="en-proceso">En Proceso</option>
+						<option value="resuelto">Resuelto</option>
+						<option value="escalado">Escalado</option>
+					</select>
+				</div>
+				<div class="filter-group">
+					<label class="filter-label">Categoría</label>
+					<select id="categoryFilter">
+						<option value="">Todas las categorías</option>
+						<option value="servicios-academicos">Servicios Académicos</option>
+						<option value="infraestructura">Infraestructura</option>
+						<option value="cafeteria">Cafetería</option>
+						<option value="biblioteca">Biblioteca</option>
+						<option value="tecnologia">Tecnología</option>
+						<option value="administrativo">Administrativo</option>
+						<option value="servicios-estudiantiles">Servicios Estudiantiles</option>
+					</select>
+				</div>
+				<div class="filter-buttons">
+					<button class="btn btn-primary" onclick="applyFilters()">Aplicar Filtros</button>
+					<button class="btn btn-secondary" onclick="clearFilters()">Limpiar</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="tickets-section">
+			<div class="tickets-header">
+				<h3 class="tickets-title">Lista de Tickets</h3>
 				<span class="tickets-count" id="ticketsCount">0 tickets</span>
 			</div>
 			<div id="ticketsContainer">
 				<div class="loading">
 					<p>Cargando tickets...</p>
 				</div>
-			<div>
-				
-				<button type="button" class="cancel-btn" onclick="history.back()">Cancelar</button>
-			</div>
 			</div>
 		</div>
 	</div>
@@ -480,11 +550,11 @@
 			} catch (error) {
 				console.error('Error loading tickets:', error);
 				container.innerHTML = `
-					<div class="error">
-						<p>❌ Error al cargar los tickets: ${error.message}</p>
-						<button onclick="loadTickets()" class="btn btn-primary" style="margin-top: 10px;">Reintentar</button>
-					</div>
-				`;
+                    <div class="error">
+                        <p>❌ Error al cargar los tickets: ${error.message}</p>
+                        <button onclick="loadTickets()" class="btn btn-primary" style="margin-top: 10px;">Reintentar</button>
+                    </div>
+                `;
 			}
 		}
 
@@ -518,54 +588,52 @@
 
 			if (tickets.length === 0) {
 				container.innerHTML = `
-					<div class="no-tickets">
-						<p>No hay tickets que mostrar con los filtros actuales.</p>
-					</div>
-				`;
+                    <div class="no-tickets">
+                        <p>No hay tickets que mostrar con los filtros actuales.</p>
+                    </div>
+                `;
 				return;
 			}
 
 			const tableHTML = `
-				<table class="tickets-table">
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>Fecha</th>
-							<th>Estudiante</th>
-							<th>Asunto</th>
-							<th>Categoría</th>
-							<th>Prioridad</th>
-							<th>Estado</th>
-							<th>Acciones</th>
-						</tr>
-					</thead>
-					<tbody>
-						${tickets.map(ticket => `
-							<tr>
-								<td>#${ticket.id}</td>
-								<td class="ticket-date">${formatDate(ticket.date)}</td>
-								<td class="user-info">
-									<strong>${ticket.user.name} ${ticket.user.last_name}</strong>
-								</td>
-								<td>
-									<strong>${ticket.title}</strong>
-									<div style="font-size: 0.8rem; color: #666; margin-top: 0.25rem;">
-										${ticket.content.substring(0, 80)}${ticket.content.length > 80 ? '...' : ''}
-									</div>
-								</td>
-								<td><span class="category-badge">${ticket.categoryName}</span></td>
-								<td><span class="priority-badge priority-${ticket.priority}">${getPriorityText(ticket.priority)}</span></td>
-								<td><span class="status-badge status-${ticket.status}">${getStatusText(ticket.status)}</span></td>
-								<td>
-									<div class="action-buttons">
-										<a href="/ticket/${ticket.id}" class="btn btn-small btn-resolve">Resolver</a>
-									</div>
-								</td>
-							</tr>
-						`).join('')}
-					</tbody>
-				</table>
-			`;
+                <table class="tickets-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Estudiante</th>
+                            <th>Asunto</th>
+                            <th>Categoría</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tickets.map(ticket => `
+                            <tr>
+                                <td>#${ticket.id}</td>
+                                <td class="ticket-date">${formatDate(ticket.date)}</td>
+                                <td class="user-info">
+                                    <strong>${ticket.user.name} ${ticket.user.last_name}</strong>
+                                </td>
+                                <td>
+                                    <strong>${ticket.title}</strong>
+                                    <div style="font-size: 0.8rem; color: #666; margin-top: 0.25rem;">
+                                        ${ticket.content.substring(0, 80)}${ticket.content.length > 80 ? '...' : ''}
+                                    </div>
+                                </td>
+                                <td><span class="category-badge">${ticket.categoryName}</span></td>
+                                <td><span class="status-badge status-${ticket.status}">${getStatusText(ticket.status)}</span></td>
+                                <td>
+                                    <div class="action-buttons">
+																			<a href="/ticket/${ticket.id}" class="btn btn-small btn-resolve">Resolver</a>	
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
 
 			container.innerHTML = tableHTML;
 		}
@@ -574,16 +642,14 @@
 			console.log('Applying filters...');
 			const statusFilter = document.getElementById('statusFilter').value;
 			const categoryFilter = document.getElementById('categoryFilter').value;
-			const priorityFilter = document.getElementById('priorityFilter').value;
 
-			console.log('Filters:', {statusFilter, categoryFilter, priorityFilter});
+			console.log('Filters:', {statusFilter, categoryFilter});
 
 			filteredTickets = allTickets.filter(ticket => {
 				const matchesStatus = !statusFilter || ticket.status === statusFilter;
 				const matchesCategory = !categoryFilter || ticket.category === categoryFilter;
-				const matchesPriority = !priorityFilter || ticket.priority === priorityFilter;
 
-				return matchesStatus && matchesCategory && matchesPriority;
+				return matchesStatus && matchesCategory;
 			});
 
 			console.log(`Filtered to ${filteredTickets.length} tickets`);
@@ -595,7 +661,6 @@
 			console.log('Clearing filters...');
 			document.getElementById('statusFilter').value = '';
 			document.getElementById('categoryFilter').value = '';
-			document.getElementById('priorityFilter').value = '';
 
 			filteredTickets = [...allTickets];
 			displayTickets(filteredTickets);
@@ -619,15 +684,6 @@
 			}
 		}
 
-		function getPriorityText(priority) {
-			const priorities = {
-				'alta': 'Alta',
-				'media': 'Media',
-				'baja': 'Baja'
-			};
-			return priorities[priority] || priority;
-		}
-
 		function getStatusText(status) {
 			const statuses = {
 				'pendiente': 'Pendiente',
@@ -637,88 +693,6 @@
 			};
 			return statuses[status] || status;
 		}
-	</script>
-
-	<!-- Añadir este script al final del archivo ticket.html -->
-	<script>
-		async function resolveTicket(ticketId) {
-			try {
-				const response = await fetch(`/api/tickets/${ticketId}/resolve`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({
-						assigned_to: document.getElementById('assignedTo').value,
-						admin_response: document.getElementById('adminResponse').value,
-						status: document.getElementById('statusSelect').value,
-						resolution_date: document.getElementById('resolutionDate').value,
-						time_spent: document.getElementById('timeSpent').value,
-						follow_up_required: document.getElementById('followUpRequired').checked,
-						follow_up_date: document.getElementById('followUpDate').value,
-						internal_notes: document.getElementById('internalNotes').value
-					})
-				});
-
-				const data = await response.json();
-
-				if (data.success) {
-					alert('Ticket resuelto exitosamente');
-					window.location.href = '/ticket';
-				} else {
-					alert(`Error: ${data.message}`);
-				}
-			} catch (error) {
-				console.error('Error:', error);
-				alert('Error al resolver el ticket');
-			}
-		}
-
-		// Función para cargar los datos del ticket
-		async function loadTicketData(ticketId) {
-			try {
-				const response = await fetch(`/api/tickets/${ticketId}`);
-				const data = await response.json();
-
-				if (data.success) {
-					const ticket = data.ticket;
-
-					// Llenar los campos del formulario
-					document.getElementById('ticketTitle').textContent = ticket.title;
-					document.getElementById('ticketContent').textContent = ticket.content;
-					document.getElementById('ticketCategory').textContent = ticket.categoryName;
-					document.getElementById('ticketPriority').textContent = getPriorityText(ticket.priority);
-					document.getElementById('ticketStatus').textContent = getStatusText(ticket.status);
-					document.getElementById('ticketDate').textContent = formatDate(ticket.date);
-					document.getElementById('userName').textContent = `${ticket.user.name} ${ticket.user.last_name}`;
-					document.getElementById('userEmail').textContent = ticket.user.email;
-
-					// Si hay respuesta previa, llenar los campos
-					if (ticket.response) {
-						document.getElementById('assignedTo').value = ticket.response.assigned_to || '';
-						document.getElementById('adminResponse').value = ticket.response.admin_response || '';
-						document.getElementById('statusSelect').value = ticket.status;
-						document.getElementById('resolutionDate').value = ticket.response.resolution_date || '';
-						document.getElementById('timeSpent').value = ticket.response.time_spent || '';
-						document.getElementById('followUpRequired').checked = ticket.response.follow_up_required || false;
-						document.getElementById('followUpDate').value = ticket.response.follow_up_date || '';
-						document.getElementById('internalNotes').value = ticket.response.internal_notes || '';
-					}
-				}
-			} catch (error) {
-				console.error('Error loading ticket data:', error);
-			}
-		}
-
-		// Cargar los datos cuando la página esté lista
-		document.addEventListener('DOMContentLoaded', function () {
-			const urlParts = window.location.pathname.split('/');
-			const ticketId = urlParts[urlParts.length - 1];
-
-			if (ticketId && !isNaN(ticketId)) {
-				loadTicketData(parseInt(ticketId));
-			}
-		});
 	</script>
 </body>
 

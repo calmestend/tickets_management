@@ -90,11 +90,92 @@
 			background-color: #c82333;
 		}
 
+		.main-flex {
+			display: flex;
+			gap: 30px;
+		}
+
+		.sidebar {
+			background: white;
+			padding: 25px 20px;
+			border-radius: 12px;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+			min-width: 220px;
+			max-width: 300px;
+			display: flex;
+			flex-direction: column;
+			height: fit-content;
+		}
+
+		.sidebar h3 {
+			margin: 0 0 16px 0;
+			font-size: 1.1rem;
+			color: var(--primary-color);
+			font-weight: 600;
+		}
+
+		.filter-list {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+
+		.filter-btn {
+			background-color: var(--accent-color);
+			border: 1px solid #ddd;
+			padding: 10px 18px;
+			border-radius: 20px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			text-align: left;
+			font-size: 1rem;
+			font-weight: 500;
+		}
+
+		.filter-btn.active,
+		.filter-btn:hover {
+			background-color: var(--primary-color);
+			color: white;
+			border-color: var(--primary-color);
+		}
+
+		.stats-section {
+			background-color: white;
+			padding: 15px;
+			border-radius: 8px;
+			margin-bottom: 20px;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		}
+
+		.stats-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+			gap: 15px;
+		}
+
+		.stat-item {
+			text-align: center;
+			padding: 10px;
+			background-color: var(--accent-color);
+			border-radius: 8px;
+		}
+
+		.stat-number {
+			font-size: 1.5rem;
+			font-weight: bold;
+			color: var(--primary-color);
+		}
+
+		.stat-label {
+			font-size: 0.8rem;
+			color: #666;
+		}
+
 		.ticket-container {
 			display: grid;
 			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 			gap: 20px;
-			margin-top: 30px;
+			margin-top: 0;
 		}
 
 		.ticket-card {
@@ -173,60 +254,6 @@
 			color: #721C24;
 		}
 
-		.priority-badge {
-			display: inline-block;
-			padding: 2px 8px;
-			border-radius: 12px;
-			font-size: 0.7rem;
-			font-weight: bold;
-			margin-left: 10px;
-		}
-
-		.priority-alta {
-			background-color: #ffebee;
-			color: #c62828;
-		}
-
-		.priority-media {
-			background-color: #fff3e0;
-			color: #e65100;
-		}
-
-		.priority-baja {
-			background-color: #e8f5e8;
-			color: #2e7d32;
-		}
-
-		.filter-section {
-			background-color: white;
-			padding: 15px;
-			border-radius: 8px;
-			margin-bottom: 20px;
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-		}
-
-		.filter-options {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 10px;
-		}
-
-		.filter-btn {
-			background-color: var(--accent-color);
-			border: 1px solid #ddd;
-			padding: 8px 15px;
-			border-radius: 20px;
-			cursor: pointer;
-			transition: all 0.3s ease;
-		}
-
-		.filter-btn:hover,
-		.filter-btn.active {
-			background-color: var(--primary-color);
-			color: white;
-			border-color: var(--primary-color);
-		}
-
 		.no-tickets {
 			text-align: center;
 			padding: 40px;
@@ -279,46 +306,31 @@
 			margin: 20px 0;
 		}
 
-		.stats-section {
-			background-color: white;
-			padding: 15px;
-			border-radius: 8px;
-			margin-bottom: 20px;
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		.ticket-img-evidence {
+			display: block;
+			margin: 8px 0;
+			max-width: 80px;
+			max-height: 80px;
+			border-radius: 6px;
+			border: 1px solid #eee;
 		}
 
-		.stats-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-			gap: 15px;
-		}
-
-		.stat-item {
-			text-align: center;
-			padding: 10px;
-			background-color: var(--accent-color);
-			border-radius: 8px;
-		}
-
-		.stat-number {
-			font-size: 1.5rem;
-			font-weight: bold;
-			color: var(--primary-color);
-		}
-
-		.stat-label {
-			font-size: 0.8rem;
+		.ticket-img-label {
+			font-size: 0.8em;
 			color: #666;
+			display: block;
+			margin-bottom: 4px;
 		}
 
-		@media (max-width: 768px) {
-			.nav-section {
+		@media (max-width: 1000px) {
+			.main-flex {
 				flex-direction: column;
-				align-items: stretch;
 			}
 
-			.login-btn {
-				text-align: center;
+			.sidebar {
+				max-width: 100%;
+				min-width: unset;
+				margin-bottom: 30px;
 			}
 		}
 	</style>
@@ -338,17 +350,10 @@
 		</div>
 	</div>
 
-	<main class="container">
-		<div class="stats-section" id="statsSection" style="display: none;">
-			<h3>Estadísticas Generales</h3>
-			<div class="stats-grid" id="statsGrid">
-				<!-- Las estadísticas se cargarán dinámicamente -->
-			</div>
-		</div>
-
-		<div class="filter-section">
-			<h3>Filtrar por categoría:</h3>
-			<div class="filter-options">
+	<div class="container main-flex">
+		<aside class="sidebar">
+			<h3>Filtrar por categoría</h3>
+			<div class="filter-list">
 				<button class="filter-btn active" data-filter="todos">Todos</button>
 				<button class="filter-btn" data-filter="servicios-academicos">Servicios Académicos</button>
 				<button class="filter-btn" data-filter="infraestructura">Infraestructura</button>
@@ -358,20 +363,25 @@
 				<button class="filter-btn" data-filter="administrativo">Administrativo</button>
 				<button class="filter-btn" data-filter="servicios-estudiantiles">Servicios Estudiantiles</button>
 			</div>
-		</div>
-
-		<div class="ticket-container" id="ticketsContainer">
-			<div class="loading">
-				<p>Cargando tickets...</p>
+			<div class="stats-section" id="statsSection" style="margin-top: 30px; display: none;">
+				<h3>Estadísticas Generales</h3>
+				<div class="stats-grid" id="statsGrid"></div>
 			</div>
-		</div>
-	</main>
+		</aside>
+
+		<main style="flex:1;">
+			<div class="ticket-container" id="ticketsContainer">
+				<div class="loading">
+					<p>Cargando tickets...</p>
+				</div>
+			</div>
+		</main>
+	</div>
 
 	<script>
 		let allTickets = [];
 		let currentFilter = 'todos';
 
-		// Verificar sesión al cargar
 		document.addEventListener('DOMContentLoaded', function () {
 			checkSession();
 			loadTickets();
@@ -485,7 +495,6 @@
 
 		function displayTickets(tickets) {
 			const container = document.getElementById('ticketsContainer');
-
 			if (tickets.length === 0) {
 				container.innerHTML = `
 					<div class="no-tickets">
@@ -494,23 +503,41 @@
 				`;
 				return;
 			}
-
-			container.innerHTML = tickets.map(ticket => `
+			container.innerHTML = tickets.map(ticket => {
+				let userImageHtml = '';
+				let adminImageHtml = '';
+				// Imagen subida por el usuario (si existe)
+				if (ticket.user_image && ticket.user_image !== '') {
+					userImageHtml = `
+						<img src="/static/${ticket.user_image}" alt="Evidencia usuario" class="ticket-img-evidence">
+						<span class="ticket-img-label">Evidencia usuario</span>
+					`;
+				}
+				// Imagen subida por el admin (comprobante resolución)
+				if (ticket.admin_image && ticket.admin_image !== '') {
+					adminImageHtml = `
+						<img src="/static/${ticket.admin_image}" alt="Comprobante resolución" class="ticket-img-evidence">
+						<span class="ticket-img-label">Comprobante resolución</span>
+					`;
+				}
+				return `
 				<div class="ticket-card">
 					<div class="ticket-header">
 						<span class="ticket-category">${ticket.categoryName}</span>
 						<span class="ticket-date">${formatDate(ticket.date)}</span>
 					</div>
 					<div class="ticket-user">Por: ${ticket.user.name} ${ticket.user.last_name}</div>
+					${userImageHtml}
 					<h3 class="ticket-title">
 						${ticket.title}
-						<span class="priority-badge priority-${ticket.priority}">${getPriorityText(ticket.priority)}</span>
 					</h3>
 					<p class="ticket-content">${ticket.content}</p>
 					${ticket.incident_date ? `<p class="ticket-date"><strong>Fecha del incidente:</strong> ${formatDate(ticket.incident_date)}</p>` : ''}
 					<span class="ticket-status status-${ticket.status}">${getStatusText(ticket.status)}</span>
+					${adminImageHtml}
 				</div>
-			`).join('');
+				`;
+			}).join('');
 		}
 
 		async function filterTickets(category) {
@@ -563,16 +590,7 @@
 			return statusMap[status] || status;
 		}
 
-		function getPriorityText(priority) {
-			const priorityMap = {
-				'alta': 'Alta',
-				'media': 'Media',
-				'baja': 'Baja'
-			};
-			return priorityMap[priority] || priority;
-		}
 
-		// Event listeners para filtros
 		document.querySelectorAll('.filter-btn').forEach(btn => {
 			btn.addEventListener('click', () => {
 				document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));

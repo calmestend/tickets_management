@@ -109,21 +109,6 @@
 			font-weight: 500;
 		}
 
-		.priority-alta {
-			background-color: #ffebee;
-			color: #c62828;
-		}
-
-		.priority-media {
-			background-color: #fff3e0;
-			color: #e65100;
-		}
-
-		.priority-baja {
-			background-color: #e8f5e8;
-			color: #2e7d32;
-		}
-
 		.status-pendiente {
 			background-color: #fff3cd;
 			color: #856404;
@@ -253,17 +238,6 @@
 			margin-top: 2rem;
 		}
 
-		.checkbox-group {
-			display: flex;
-			align-items: center;
-			gap: 0.5rem;
-		}
-
-		.checkbox-label {
-			margin: 0;
-			font-weight: normal;
-		}
-
 		@media (max-width: 768px) {
 			.form-row {
 				flex-direction: column;
@@ -276,6 +250,127 @@
 			.btn {
 				width: 100%;
 			}
+		}
+
+		.file-upload-area {
+			border: 2px dashed var(--primary-color);
+			border-radius: 8px;
+			padding: 20px;
+			text-align: center;
+			background: #f0fff4;
+			cursor: pointer;
+			margin-bottom: 1rem;
+		}
+
+		.file-upload-area.dragover {
+			border-color: #0FBBC9;
+			background: #e6fffa;
+		}
+
+		.file-upload-icon {
+			font-size: 32px;
+			color: var(--primary-color);
+			margin-bottom: 10px;
+		}
+
+		.file-upload-text {
+			color: #2d3748;
+			font-size: 15px;
+			font-weight: 600;
+			margin-bottom: 6px;
+		}
+
+		.file-upload-hint {
+			color: #718096;
+			font-size: 13px;
+			margin-bottom: 8px;
+		}
+
+		.file-restrictions {
+			color: #4a5568;
+			font-size: 12px;
+			margin-top: 5px;
+			padding: 7px;
+			background: #edf2f7;
+			border-radius: 6px;
+		}
+
+		.uploaded-files {
+			margin-top: 15px;
+		}
+
+		.file-item {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 10px 12px;
+			background: white;
+			border: 1px solid #e2e8f0;
+			border-radius: 8px;
+			margin-bottom: 8px;
+		}
+
+		.file-info {
+			display: flex;
+			align-items: center;
+			gap: 7px;
+		}
+
+		.file-icon {
+			font-size: 18px;
+			color: var(--primary-color);
+		}
+
+		.file-details {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.file-name {
+			font-weight: 600;
+			color: #2d3748;
+			font-size: 13px;
+		}
+
+		.file-size {
+			color: #718096;
+			font-size: 11px;
+		}
+
+		.remove-file {
+			background: #e53e3e;
+			color: white;
+			border: none;
+			border-radius: 50%;
+			width: 20px;
+			height: 20px;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 13px;
+			transition: all 0.3s ease;
+		}
+
+		.remove-file:hover {
+			background: #c53030;
+			transform: scale(1.1);
+		}
+
+		.ticket-evidence-img {
+			display: block;
+			max-width: 100px;
+			max-height: 100px;
+			border-radius: 8px;
+			border: 1px solid #eee;
+			margin-bottom: 4px;
+		}
+
+		.ticket-evidence-label {
+			font-size: 0.85em;
+			color: #666;
+			margin-bottom: 10px;
+			display: block;
 		}
 	</style>
 </head>
@@ -296,44 +391,28 @@
 			</div>
 		</div>
 	</div>
-
 	<div class="container">
 		<div class="ticket-container">
 			<div class="ticket-header">
 				<h1 class="ticket-title" id="ticketTitle">Cargando ticket...</h1>
 				<div class="ticket-meta">
-					<span>
-						<strong>Categoría:</strong>
-						<span class="badge category-badge" id="ticketCategory">Cargando...</span>
-					</span>
-					<span>
-						<strong>Prioridad:</strong>
-						<span class="badge" id="ticketPriority">Cargando...</span>
-					</span>
-					<span>
-						<strong>Estado:</strong>
-						<span class="badge" id="ticketStatus">Cargando...</span>
-					</span>
-					<span>
-						<strong>Fecha:</strong>
-						<span id="ticketDate">Cargando...</span>
-					</span>
+					<span><strong>Categoría:</strong> <span class="badge category-badge"
+							id="ticketCategory">Cargando...</span></span>
+					<span><strong>Estado:</strong> <span class="badge" id="ticketStatus">Cargando...</span></span>
+					<span><strong>Fecha:</strong> <span id="ticketDate">Cargando...</span></span>
 				</div>
 			</div>
-
+			<div id="ticketEvidenceImages"></div>
 			<div class="user-info">
 				<h3>Información del Usuario</h3>
 				<p><strong>Nombre:</strong> <span id="userName">Cargando...</span></p>
 				<p><strong>Email:</strong> <span id="userEmail">Cargando...</span></p>
 			</div>
-
 			<div class="ticket-content" id="ticketContent">
 				Cargando contenido del ticket...
 			</div>
-
 			<h2>Resolver Ticket</h2>
-
-			<form id="resolutionForm">
+			<form id="resolutionForm" autocomplete="off" enctype="multipart/form-data">
 				<div class="form-row">
 					<div class="form-col">
 						<div class="form-group">
@@ -353,7 +432,6 @@
 						</div>
 					</div>
 				</div>
-
 				<div class="form-row">
 					<div class="form-col">
 						<div class="form-group">
@@ -364,30 +442,31 @@
 					<div class="form-col">
 						<div class="form-group">
 							<label for="timeSpent" class="form-label">Tiempo invertido (horas)</label>
-							<input type="number" step="0.5" id="timeSpent" class="form-control">
+							<input type="number" step="0.5" id="timeSpent" class="form-control" min="0" max="99.99">
 						</div>
 					</div>
 				</div>
-
 				<div class="form-group">
 					<label for="adminResponse" class="form-label">Respuesta del administrador</label>
 					<textarea id="adminResponse" class="form-control" required></textarea>
 				</div>
-
+				<!-- Adjuntar imagen de resolución -->
 				<div class="form-group">
-					<div class="checkbox-group">
-						<input type="checkbox" id="followUpRequired">
-						<label for="followUpRequired" class="checkbox-label">Requiere seguimiento</label>
+					<label>Comprobante de resolución (imagen)</label>
+					<div class="file-upload-area" id="proofUploadArea">
+						<div class="file-upload-icon">🖼️</div>
+						<div class="file-upload-text">Arrastra una imagen aquí o haz clic para seleccionar</div>
+						<div class="file-upload-hint">Puedes adjuntar una foto, captura o evidencia de la resolución</div>
+						<input type="file" id="proofInput" class="file-input" accept=".jpg,.jpeg,.png,.gif">
 					</div>
-					<input type="date" id="followUpDate" class="form-control" style="margin-top: 0.5rem; display: none;">
+					<div class="file-restrictions">
+						<strong>Restricciones:</strong> Un solo archivo, máximo 5MB. Formatos permitidos: JPG, JPEG, PNG, GIF
+					</div>
+					<div class="uploaded-files" id="proofUploaded" style="display:none;">
+						<h4 style="margin-bottom: 8px; color: #2d3748;">Imagen seleccionada:</h4>
+						<div id="proofFileList"></div>
+					</div>
 				</div>
-
-				<div class="form-group">
-						<!-- Cambiar por evidencia en foto -->
-					<label for="internalNotes" class="form-label">Notas internas</label>
-					<textarea id="internalNotes" class="form-control"></textarea>
-				</div>
-
 				<div class="btn-group">
 					<button type="button" class="btn btn-primary" id="resolveBtn">Guardar Resolución</button>
 					<a href="/ticket" class="btn btn-secondary">Volver al Listado</a>
@@ -395,101 +474,130 @@
 			</form>
 		</div>
 	</div>
-
 	<script>
-		// Mostrar/ocultar campo de fecha de seguimiento según checkbox
-		document.getElementById('followUpRequired').addEventListener('change', function () {
-			const followUpDate = document.getElementById('followUpDate');
-			followUpDate.style.display = this.checked ? 'block' : 'none';
-			followUpDate.required = this.checked;
+		// --- IMAGE UPLOAD FOR PROOF ---
+		let proofFile = null;
+		const maxProofSize = 5 * 1024 * 1024; // 5MB
+		const allowedProofExt = ['jpg', 'jpeg', 'png', 'gif'];
+		const allowedProofTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+		const proofInput = document.getElementById('proofInput');
+		const proofUploadArea = document.getElementById('proofUploadArea');
+		const proofUploadedDiv = document.getElementById('proofUploaded');
+		const proofFileList = document.getElementById('proofFileList');
+
+		proofUploadArea.addEventListener('click', () => {proofInput.click();});
+		proofInput.addEventListener('change', (e) => {handleProofFiles(e.target.files);});
+
+		['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => {
+			proofUploadArea.addEventListener(ev, preventDefaults, false);
+			document.body.addEventListener(ev, preventDefaults, false);
+		});
+		function preventDefaults(e) {e.preventDefault(); e.stopPropagation();}
+		['dragenter', 'dragover'].forEach(ev => {proofUploadArea.addEventListener(ev, () => {proofUploadArea.classList.add('dragover');});});
+		['dragleave', 'drop'].forEach(ev => {proofUploadArea.addEventListener(ev, () => {proofUploadArea.classList.remove('dragover');});});
+		proofUploadArea.addEventListener('drop', (e) => {
+			const dt = e.dataTransfer;
+			const files = dt.files;
+			if (files.length > 0) {handleProofFiles(files);}
 		});
 
-		// Función para formatear fechas
+		function handleProofFiles(files) {
+			const file = files[0];
+			if (!file) {return;}
+			const ext = file.name.split('.').pop().toLowerCase();
+			if (!allowedProofTypes.includes(file.type) || !allowedProofExt.includes(ext)) {
+				alert('Formato de imagen no permitido. Usa JPG, JPEG, PNG o GIF.');
+				return;
+			}
+			if (file.size > maxProofSize) {
+				alert('La imagen es demasiado grande. Máximo 5MB.');
+				return;
+			}
+			proofFile = file;
+			updateProofList();
+		}
+		function formatFileSize(bytes) {
+			if (bytes === 0) return '0 Bytes';
+			const k = 1024, sizes = ['Bytes', 'KB', 'MB', 'GB'], i = Math.floor(Math.log(bytes) / Math.log(k));
+			return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+		}
+		function updateProofList() {
+			if (!proofFile) {
+				proofUploadedDiv.style.display = 'none';
+				proofFileList.innerHTML = '';
+				return;
+			}
+			proofUploadedDiv.style.display = 'block';
+			let fileIcon = '🖼️';
+			proofFileList.innerHTML = `
+				<div class="file-item">
+					<div class="file-info">
+						<div class="file-icon">${fileIcon}</div>
+						<div class="file-details">
+							<div class="file-name">${proofFile.name}</div>
+							<div class="file-size">${formatFileSize(proofFile.size)}</div>
+						</div>
+					</div>
+					<button type="button" class="remove-file" onclick="removeProofFile()">×</button>
+				</div>
+			`;
+		}
+		function removeProofFile() {
+			proofFile = null;
+			updateProofList();
+		}
+
+		// --- TICKET LOGIC ---
 		function formatDate(dateString) {
 			if (!dateString) return 'No especificada';
 			try {
 				const date = new Date(dateString);
-				return date.toLocaleDateString('es-ES', {
-					year: 'numeric',
-					month: '2-digit',
-					day: '2-digit'
-				});
-			} catch (e) {
-				return dateString;
-			}
+				return date.toLocaleDateString('es-ES', {year: 'numeric', month: '2-digit', day: '2-digit'});
+			} catch (e) {return dateString;}
 		}
-
-		// Función para obtener texto de prioridad
-		function getPriorityText(priority) {
-			const priorities = {
-				'alta': 'Alta',
-				'media': 'Media',
-				'baja': 'Baja'
-			};
-			return priorities[priority] || priority;
-		}
-
-		// Función para obtener texto de estado
 		function getStatusText(status) {
-			const statuses = {
-				'pendiente': 'Pendiente',
-				'en-proceso': 'En Proceso',
-				'resuelto': 'Resuelto',
-				'escalado': 'Escalado'
-			};
+			const statuses = {'pendiente': 'Pendiente', 'en-proceso': 'En Proceso', 'resuelto': 'Resuelto', 'escalado': 'Escalado'};
 			return statuses[status] || status;
 		}
-
-		// Función para cargar los datos del ticket
 		async function loadTicketData(ticketId) {
 			try {
 				const response = await fetch(`/api/tickets/${ticketId}`);
-				if (!response.ok) {
-					throw new Error(`Error HTTP: ${response.status}`);
-				}
-
+				if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
 				const data = await response.json();
-
 				if (data.success && data.ticket) {
 					const ticket = data.ticket;
-
-					// Llenar los campos de visualización
 					document.getElementById('ticketTitle').textContent = ticket.subject || 'Sin asunto';
 					document.getElementById('ticketContent').textContent = ticket.description || 'Sin descripción';
 					document.getElementById('ticketCategory').textContent = ticket.categoryName || 'Sin categoría';
-
-					const priorityBadge = document.getElementById('ticketPriority');
-					priorityBadge.textContent = getPriorityText(ticket.priority);
-					priorityBadge.className = `badge priority-${ticket.priority}`;
-
 					const statusBadge = document.getElementById('ticketStatus');
 					statusBadge.textContent = getStatusText(ticket.status);
 					statusBadge.className = `badge status-${ticket.status}`;
-
 					document.getElementById('ticketDate').textContent = formatDate(ticket.created_at);
 					document.getElementById('userName').textContent = `${ticket.user?.name || 'Nombre'} ${ticket.user?.last_name || 'Apellido'}`;
 					document.getElementById('userEmail').textContent = ticket.user?.email || 'Sin email';
-
-					// Llenar el formulario de resolución
 					document.getElementById('statusSelect').value = ticket.status || 'pendiente';
-
 					if (ticket.response) {
 						document.getElementById('assignedTo').value = ticket.response.assigned_to || '';
 						document.getElementById('adminResponse').value = ticket.response.admin_response || '';
 						document.getElementById('resolutionDate').value = ticket.response.resolution_date || '';
 						document.getElementById('timeSpent').value = ticket.response.time_spent || '';
-						document.getElementById('followUpRequired').checked = ticket.response.follow_up_required || false;
-						document.getElementById('followUpDate').value = ticket.response.follow_up_date || '';
-						document.getElementById('internalNotes').value = ticket.response.internal_notes || '';
-
-						if (ticket.response.follow_up_required) {
-							document.getElementById('followUpDate').style.display = 'block';
-						}
 					} else {
-						// Valores por defecto para tickets sin respuesta previa
 						const today = new Date().toISOString().split('T')[0];
 						document.getElementById('resolutionDate').value = today;
 					}
+
+					// --- Renderizar imágenes de evidencia ---
+					const imagesDiv = document.getElementById('ticketEvidenceImages');
+					let html = '';
+					if (ticket.user_image && ticket.user_image !== '') {
+						html += `<img src="/static/${ticket.user_image}" alt="Evidencia usuario" class="ticket-evidence-img">
+								 <span class="ticket-evidence-label">Evidencia usuario</span>`;
+					}
+					if (ticket.admin_image && ticket.admin_image !== '') {
+						html += `<img src="/static/${ticket.admin_image}" alt="Comprobante resolución" class="ticket-evidence-img">
+								 <span class="ticket-evidence-label">Comprobante resolución</span>`;
+					}
+					imagesDiv.innerHTML = html;
 				}
 			} catch (error) {
 				console.error('Error al cargar los datos del ticket:', error);
@@ -497,36 +605,26 @@
 			}
 		}
 
-		// Función para resolver el ticket
 		async function resolveTicket(ticketId) {
 			try {
-				const formData = {
-					assigned_to: document.getElementById('assignedTo').value,
-					admin_response: document.getElementById('adminResponse').value,
-					status: document.getElementById('statusSelect').value,
-					resolution_date: document.getElementById('resolutionDate').value,
-					time_spent: document.getElementById('timeSpent').value,
-					follow_up_required: document.getElementById('followUpRequired').checked,
-					follow_up_date: document.getElementById('followUpDate').value,
-					internal_notes: document.getElementById('internalNotes').value
-				};
-
-				// Validación básica
-				if (!formData.assigned_to || !formData.admin_response || !formData.resolution_date) {
+				const formData = new FormData();
+				formData.append('assigned_to', document.getElementById('assignedTo').value);
+				formData.append('admin_response', document.getElementById('adminResponse').value);
+				formData.append('status', document.getElementById('statusSelect').value);
+				formData.append('resolution_date', document.getElementById('resolutionDate').value);
+				formData.append('time_spent', document.getElementById('timeSpent').value);
+				if (proofFile) {
+					formData.append('proof_image', proofFile);
+				}
+				if (!formData.get('assigned_to') || !formData.get('admin_response') || !formData.get('resolution_date')) {
 					alert('Por favor complete todos los campos requeridos');
 					return;
 				}
-
 				const response = await fetch(`/api/tickets/${ticketId}/resolve`, {
 					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify(formData)
+					body: formData
 				});
-
 				const data = await response.json();
-
 				if (data.success) {
 					alert('Ticket resuelto exitosamente');
 					window.location.href = '/ticket';
@@ -539,20 +637,12 @@
 			}
 		}
 
-		// Cargar los datos cuando la página esté lista
 		document.addEventListener('DOMContentLoaded', function () {
-			// Obtener el ID del ticket de la URL
 			const pathParts = window.location.pathname.split('/');
-			const ticketId = pathParts[pathParts.length - 1];
-
+			const ticketId = parseInt(pathParts[pathParts.length - 1]);
 			if (ticketId && !isNaN(ticketId)) {
-				// Configurar el botón de resolución
 				document.getElementById('resolveBtn').onclick = () => resolveTicket(ticketId);
-
-				// Cargar los datos del ticket
 				loadTicketData(ticketId);
-
-				// Cargar información del administrador
 				checkAdminSession();
 			} else {
 				alert('ID de ticket no válido');
@@ -560,16 +650,14 @@
 			}
 		});
 
-		// Verificar sesión de administrador
 		async function checkAdminSession() {
 			try {
 				const response = await fetch('/check-session');
 				const data = await response.json();
-
 				if (data.authenticated && data.user.role === 'admin') {
 					document.getElementById('adminName').textContent = data.user.name;
-					const initials = data.user.name.substring(0, 2).toUpperCase();
-					document.getElementById('adminAvatar').textContent = initials;
+					const initials = (data.user.name[0] || '') + (data.user.last_name ? data.user.last_name[0] : '');
+					document.getElementById('adminAvatar').textContent = initials.toUpperCase() || 'AD';
 				} else {
 					window.location.href = '/auth';
 				}

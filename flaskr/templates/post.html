@@ -156,7 +156,6 @@
 			min-height: 150px;
 		}
 
-		.priority-select,
 		.category-select {
 			background: #f0fff4;
 			border: 2px solid #38a169;
@@ -167,6 +166,123 @@
 			font-size: 12px;
 			color: #718096;
 			margin-top: 5px;
+		}
+
+		/* Estilos para subida de archivos */
+		.file-upload-area {
+			border: 2px dashed #38a169;
+			border-radius: 12px;
+			padding: 30px;
+			text-align: center;
+			background: #f0fff4;
+			transition: all 0.3s ease;
+			cursor: pointer;
+			position: relative;
+		}
+
+		.file-upload-area:hover {
+			border-color: #2d7d50;
+			background: #e6fffa;
+		}
+
+		.file-upload-area.dragover {
+			border-color: #2d7d50;
+			background: #e6fffa;
+			transform: scale(1.02);
+		}
+
+		.file-input {
+			display: none;
+		}
+
+		.file-upload-icon {
+			font-size: 48px;
+			color: #38a169;
+			margin-bottom: 15px;
+		}
+
+		.file-upload-text {
+			color: #2d3748;
+			font-size: 16px;
+			font-weight: 600;
+			margin-bottom: 8px;
+		}
+
+		.file-upload-hint {
+			color: #718096;
+			font-size: 14px;
+			margin-bottom: 15px;
+		}
+
+		.file-restrictions {
+			color: #4a5568;
+			font-size: 12px;
+			margin-top: 10px;
+			padding: 10px;
+			background: #edf2f7;
+			border-radius: 6px;
+		}
+
+		.uploaded-files {
+			margin-top: 20px;
+		}
+
+		.file-item {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 12px 15px;
+			background: white;
+			border: 1px solid #e2e8f0;
+			border-radius: 8px;
+			margin-bottom: 10px;
+		}
+
+		.file-info {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.file-icon {
+			font-size: 20px;
+			color: #38a169;
+		}
+
+		.file-details {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.file-name {
+			font-weight: 600;
+			color: #2d3748;
+			font-size: 14px;
+		}
+
+		.file-size {
+			color: #718096;
+			font-size: 12px;
+		}
+
+		.remove-file {
+			background: #e53e3e;
+			color: white;
+			border: none;
+			border-radius: 50%;
+			width: 24px;
+			height: 24px;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 14px;
+			transition: all 0.3s ease;
+		}
+
+		.remove-file:hover {
+			background: #c53030;
+			transform: scale(1.1);
 		}
 
 		.action-buttons {
@@ -286,6 +402,14 @@
 				gap: 15px;
 				text-align: center;
 			}
+
+			.file-upload-area {
+				padding: 20px;
+			}
+
+			.file-upload-icon {
+				font-size: 36px;
+			}
 		}
 	</style>
 </head>
@@ -308,22 +432,22 @@
 					<div class="form-row">
 						<div class="form-group">
 							<label for="studentName">Nombre Completo <span class="required">*</span></label>
-							<input type="text" id="studentName" value="{{ user.full_name }}" readonly class="readonly-field">
+							<input type="text" id="studentName" value="Juan Pérez García" readonly class="readonly-field">
 						</div>
 						<div class="form-group">
 							<label for="studentEmail">Email Institucional <span class="required">*</span></label>
-							<input type="email" id="studentEmail" value="{{ user.email }}" readonly class="readonly-field">
+							<input type="email" id="studentEmail" value="juan.perez@utc.edu.mx" readonly class="readonly-field">
 						</div>
 					</div>
 
 					<div class="form-row">
 						<div class="form-group">
 							<label for="carrera">Carrera</label>
-							<input type="text" id="carrera" value="{{ user.study_area }}" readonly class="readonly-field">
+							<input type="text" id="carrera" value="Ingeniería en Sistemas" readonly class="readonly-field">
 						</div>
 						<div class="form-group">
 							<label for="semestre">Semestre</label>
-							<input type="text" id="semestre" value="{{ user.term }}º Semestre" readonly class="readonly-field">
+							<input type="text" id="semestre" value="5º Semestre" readonly class="readonly-field">
 						</div>
 					</div>
 				</div>
@@ -336,8 +460,8 @@
 
 					<div class="form-row">
 						<div class="form-group">
-							<label for="type">Tipo de Solicitud <span class="required">*</span></label>
-							<select id="type" name="type" class="category-select" required>
+							<label for="complaint_type">Tipo de Solicitud <span class="required">*</span></label>
+							<select id="complaint_type" name="complaint_type" class="category-select" required>
 								<option value="">Seleccionar tipo...</option>
 								<option value="queja">🔴 Queja</option>
 								<option value="sugerencia">💡 Sugerencia</option>
@@ -362,27 +486,17 @@
 
 					<div class="form-row">
 						<div class="form-group">
-							<label for="priority">Prioridad <span class="required">*</span></label>
-							<select id="priority" name="priority" class="priority-select" required>
-								<option value="">Seleccionar prioridad...</option>
-								<option value="alta">🔴 Alta - Urgente</option>
-								<option value="media">🟡 Media - Importante</option>
-								<option value="baja">🟢 Baja - Cuando sea posible</option>
-							</select>
+							<label for="subject">Asunto <span class="required">*</span></label>
+							<input type="text" id="subject" name="subject" placeholder="Resumen breve de tu solicitud" maxlength="100"
+								required>
+							<div class="char-counter">
+								<span id="subjectCounter">0</span>/100 caracteres
+							</div>
 						</div>
 						<div class="form-group">
 							<label for="incident_date">Fecha del Incidente</label>
 							<input type="date" id="incident_date" name="incident_date">
-							<div class="help-text">Opcional: Fecha en que ocurrió el problema</div>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="subject">Asunto <span class="required">*</span></label>
-						<input type="text" id="subject" name="subject" placeholder="Resumen breve de tu solicitud" maxlength="100"
-							required>
-						<div class="char-counter">
-							<span id="subjectCounter">0</span>/100 caracteres
+							<div class="help-text">Fecha en que ocurrió el problema</div>
 						</div>
 					</div>
 
@@ -395,6 +509,34 @@
 							<span id="descriptionCounter">0</span>/1000 caracteres
 						</div>
 						<div class="help-text">Sé específico: ¿qué pasó?, ¿cuándo?, ¿dónde?, ¿quién estuvo involucrado?</div>
+					</div>
+				</div>
+
+				<!-- Sección de archivos adjuntos -->
+				<div class="form-section">
+					<h3 class="section-title">
+						📎 Archivos Adjuntos
+					</h3>
+
+					<div class="form-group">
+						<label>Adjuntar Evidencia</label>
+						<div class="file-upload-area" id="fileUploadArea">
+							<div class="file-upload-icon">📁</div>
+							<div class="file-upload-text">Arrastra archivos aquí o haz clic para seleccionar</div>
+							<div class="file-upload-hint">Puedes adjuntar capturas de pantalla, documentos o cualquier evidencia que
+								respalde tu solicitud</div>
+							<input type="file" id="fileInput" class="file-input" multiple
+								accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt">
+						</div>
+						<div class="file-restrictions">
+							<strong>Restricciones:</strong> Máximo 5 archivos, 10MB por archivo.
+							Formatos permitidos: PDF, DOC, DOCX, JPG, JPEG, PNG, GIF, TXT
+						</div>
+					</div>
+
+					<div class="uploaded-files" id="uploadedFiles" style="display: none;">
+						<h4 style="margin-bottom: 15px; color: #2d3748;">Archivos seleccionados:</h4>
+						<div id="filesList"></div>
 					</div>
 				</div>
 
@@ -413,6 +555,25 @@
 	<div id="notification" class="notification"></div>
 
 	<script>
+		// Variables globales para manejo de archivos
+		let selectedFiles = [];
+		const maxFiles = 5;
+		const maxFileSize = 10 * 1024 * 1024; // 10MB en bytes
+		// Tipos de archivo permitidos (MIME types)
+		const allowedTypes = [
+			'image/jpeg',
+			'image/jpg',
+			'image/png',
+			'image/gif',
+			'application/pdf',
+			'application/msword',
+			'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+			'text/plain'
+		];
+
+		// Extensiones permitidas (como respaldo)
+		const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'txt'];
+
 		// Contadores de caracteres
 		function setupCharCounters() {
 			const fields = [
@@ -450,6 +611,183 @@
 			}, 5000);
 		}
 
+		// Función para formatear el tamaño de archivo
+		function formatFileSize(bytes) {
+			if (bytes === 0) return '0 Bytes';
+			const k = 1024;
+			const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+			const i = Math.floor(Math.log(bytes) / Math.log(k));
+			return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+		}
+
+		// Función para validar archivos
+		function validateFile(file) {
+			console.log(`Validando archivo: ${file.name}, tipo: ${file.type}, tamaño: ${file.size}`);
+
+			// Obtener extensión del archivo
+			const fileExtension = file.name.split('.').pop().toLowerCase();
+
+			// Validar por tipo MIME y extensión (doble validación)
+			const isValidType = allowedTypes.includes(file.type);
+			const isValidExtension = allowedExtensions.includes(fileExtension);
+
+			if (!isValidType && !isValidExtension) {
+				return `Tipo de archivo no permitido: ${file.name}. Formatos permitidos: JPG, JPEG, PNG, GIF, PDF, DOC, DOCX, TXT`;
+			}
+
+			if (file.size === 0) {
+				return `Archivo vacío: ${file.name}`;
+			}
+
+			if (file.size > maxFileSize) {
+				return `Archivo muy grande: ${file.name} (${formatFileSize(file.size)}). Máximo 10MB.`;
+			}
+
+			return null;
+		}
+
+		// Función para agregar archivos
+		function addFiles(files) {
+			const fileArray = Array.from(files);
+			console.log(`Intentando agregar ${fileArray.length} archivos`);
+
+			if (selectedFiles.length + fileArray.length > maxFiles) {
+				showNotification(`Máximo ${maxFiles} archivos permitidos`, 'error');
+				return;
+			}
+
+			let addedCount = 0;
+			for (let file of fileArray) {
+				const error = validateFile(file);
+				if (error) {
+					showNotification(error, 'error');
+					continue;
+				}
+
+				// Verificar si el archivo ya existe
+				if (selectedFiles.find(f => f.name === file.name && f.size === file.size)) {
+					showNotification(`El archivo ${file.name} ya está seleccionado`, 'error');
+					continue;
+				}
+
+				selectedFiles.push(file);
+				addedCount++;
+				console.log(`Archivo agregado: ${file.name}`);
+			}
+
+			if (addedCount > 0) {
+				showNotification(`${addedCount} archivo(s) agregado(s) correctamente`, 'success');
+				updateFilesList();
+			}
+		}
+
+		// Función para actualizar la lista de archivos
+		function updateFilesList() {
+			const uploadedFilesDiv = document.getElementById('uploadedFiles');
+			const filesListDiv = document.getElementById('filesList');
+
+			if (selectedFiles.length === 0) {
+				uploadedFilesDiv.style.display = 'none';
+				return;
+			}
+
+			uploadedFilesDiv.style.display = 'block';
+			filesListDiv.innerHTML = '';
+
+			selectedFiles.forEach((file, index) => {
+				const fileItem = document.createElement('div');
+				fileItem.className = 'file-item';
+
+				const fileExtension = file.name.split('.').pop().toLowerCase();
+				let fileIcon = '📄';
+
+				if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+					fileIcon = '🖼️';
+				} else if (fileExtension === 'pdf') {
+					fileIcon = '📕';
+				} else if (['doc', 'docx'].includes(fileExtension)) {
+					fileIcon = '📝';
+				} else if (fileExtension === 'txt') {
+					fileIcon = '📝';
+				}
+
+				fileItem.innerHTML = `
+					<div class="file-info">
+						<div class="file-icon">${fileIcon}</div>
+						<div class="file-details">
+							<div class="file-name">${file.name}</div>
+							<div class="file-size">${formatFileSize(file.size)}</div>
+						</div>
+					</div>
+					<button type="button" class="remove-file" onclick="removeFile(${index})">×</button>
+				`;
+
+				filesListDiv.appendChild(fileItem);
+			});
+		}
+
+		// Función para remover archivo
+		function removeFile(index) {
+			const removedFile = selectedFiles[index];
+			selectedFiles.splice(index, 1);
+			showNotification(`Archivo ${removedFile.name} eliminado`, 'info');
+			updateFilesList();
+		}
+
+		// Configurar drag and drop
+		function setupFileUpload() {
+			const fileUploadArea = document.getElementById('fileUploadArea');
+			const fileInput = document.getElementById('fileInput');
+
+			// Click para seleccionar archivos
+			fileUploadArea.addEventListener('click', () => {
+				console.log('Área de upload clickeada, abriendo selector de archivos...');
+				fileInput.click();
+			});
+
+			// Cambio en input file
+			fileInput.addEventListener('change', (e) => {
+				const files = e.target.files;
+				console.log(`Archivos seleccionados desde input: ${files.length}`);
+				if (files.length > 0) {
+					addFiles(files);
+				}
+				e.target.value = ''; // Limpiar input para permitir seleccionar el mismo archivo
+			});
+
+			// Drag and drop events
+			['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+				fileUploadArea.addEventListener(eventName, preventDefaults, false);
+				document.body.addEventListener(eventName, preventDefaults, false);
+			});
+
+			function preventDefaults(e) {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+
+			['dragenter', 'dragover'].forEach(eventName => {
+				fileUploadArea.addEventListener(eventName, () => {
+					fileUploadArea.classList.add('dragover');
+				});
+			});
+
+			['dragleave', 'drop'].forEach(eventName => {
+				fileUploadArea.addEventListener(eventName, () => {
+					fileUploadArea.classList.remove('dragover');
+				});
+			});
+
+			fileUploadArea.addEventListener('drop', (e) => {
+				const dt = e.dataTransfer;
+				const files = dt.files;
+				console.log(`Archivos desde drag & drop: ${files.length}`);
+				if (files.length > 0) {
+					addFiles(files);
+				}
+			});
+		}
+
 		// Manejar envío del formulario
 		document.getElementById('complaintForm').addEventListener('submit', async function (e) {
 			e.preventDefault();
@@ -460,24 +798,23 @@
 			submitBtn.disabled = true;
 			submitBtn.innerHTML = '⏳ Enviando...';
 
-			// Obtener datos del formulario
+			// Crear FormData para enviar archivos también
 			const formData = new FormData(this);
-			const complaintData = {
-				type: formData.get('type'),
-				category: formData.get('category'),
-				priority: formData.get('priority'),
-				subject: formData.get('subject'),
-				description: formData.get('description'),
-				incident_date: formData.get('incident_date')
-			};
+
+			// Agregar archivos al FormData
+			selectedFiles.forEach((file, index) => {
+				formData.append(`files`, file);
+				console.log(`Agregando archivo al FormData: ${file.name}`);
+			});
 
 			// Validar campos requeridos
-			const requiredFields = ['type', 'category', 'priority', 'subject', 'description'];
+			const requiredFields = ['complaint_type', 'category', 'subject', 'description'];
 			let isValid = true;
 
 			requiredFields.forEach(fieldName => {
 				const field = document.getElementById(fieldName);
-				if (!complaintData[fieldName] || !complaintData[fieldName].trim()) {
+				const value = formData.get(fieldName);
+				if (!value || !value.toString().trim()) {
 					field.style.borderColor = '#e53e3e';
 					isValid = false;
 				} else {
@@ -493,15 +830,16 @@
 			}
 
 			try {
+				console.log('Enviando formulario...');
+				console.log(`Archivos a enviar: ${selectedFiles.length}`);
+
 				const response = await fetch('/post', {
 					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(complaintData)
+					body: formData
 				});
 
 				const result = await response.json();
+				console.log('Respuesta del servidor:', result);
 
 				if (result.success) {
 					showNotification(result.message, 'success');
@@ -509,9 +847,11 @@
 					// Limpiar formulario después de un delay
 					setTimeout(() => {
 						this.reset();
+						selectedFiles = [];
+						updateFilesList();
 						setupCharCounters();
-						// Redirigir al inicio
-						window.location.href = '/';
+						// Opcional: redirigir
+						// window.location.href = '/';
 					}, 2000);
 				} else {
 					showNotification(result.message, 'error');
@@ -531,9 +871,11 @@
 			submitBtn.innerHTML = '📤 Enviar Solicitud';
 		});
 
-		// Inicializar contadores al cargar la página
+		// Inicializar componentes al cargar la página
 		document.addEventListener('DOMContentLoaded', function () {
+			console.log('Inicializando formulario...');
 			setupCharCounters();
+			setupFileUpload();
 		});
 	</script>
 </body>

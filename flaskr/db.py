@@ -61,7 +61,6 @@ def init_complaints():
                 'cafeteria', 
                 'otro'
             ) NOT NULL,
-            priority ENUM('alta', 'media', 'baja') NOT NULL DEFAULT 'media',
             subject VARCHAR(100) NOT NULL,
             description TEXT NOT NULL,
             incident_date DATE,
@@ -87,9 +86,6 @@ def init_complaint_responses():
             admin_response TEXT,
             resolution_date DATE,
             time_spent DECIMAL(4,2),
-            follow_up_required BOOLEAN DEFAULT FALSE,
-            follow_up_date DATE,
-            internal_notes TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (complaint_id) REFERENCES complaints(id) ON DELETE CASCADE
@@ -107,7 +103,6 @@ def create_indexes():
         "CREATE INDEX idx_complaints_user_id ON complaints(user_id);",
         "CREATE INDEX idx_complaints_status ON complaints(status);",
         "CREATE INDEX idx_complaints_created_at ON complaints(created_at);",
-        "CREATE INDEX idx_complaints_priority ON complaints(priority);",
         "CREATE INDEX idx_complaints_category ON complaints(category);",
         "CREATE INDEX idx_users_email ON users(email);",
         "CREATE INDEX idx_users_user_id ON users(user_id);",
@@ -129,12 +124,12 @@ def insert_sample_data():
     try:
         admin_user = """
             INSERT INTO users (email, password, user_id, role, name, last_name, 
-                             study_area, study_speciality, term, avatar_initials, 
-                             personal_description) 
+                               study_area, study_speciality, term, avatar_initials, 
+                               personal_description) 
             VALUES (
                 'admin@utc.edu.mx', 
-                'hashed_password_admin', 
-                'UTC001', 
+                '222', 
+                '1111111112', 
                 'admin', 
                 'María', 
                 'González López', 
@@ -145,15 +140,15 @@ def insert_sample_data():
                 'Administradora del sistema de quejas y sugerencias'
             ) ON DUPLICATE KEY UPDATE email=email;
         """
-        
+
         student_user = """
             INSERT INTO users (email, password, user_id, role, name, last_name, 
-                             study_area, study_speciality, term, avatar_initials, 
-                             personal_description) 
+                               study_area, study_speciality, term, avatar_initials, 
+                               personal_description) 
             VALUES (
                 'juan.perez@utc.edu.mx', 
-                'hashed_password_student', 
-                'UTC002', 
+                '123', 
+                '1111111111', 
                 'student', 
                 'Juan', 
                 'Pérez Díaz', 
@@ -164,31 +159,37 @@ def insert_sample_data():
                 'Estudiante apasionado por la tecnología y el desarrollo de software.'
             ) ON DUPLICATE KEY UPDATE email=email;
         """
-        
+
         cur.execute(admin_user)
         cur.execute(student_user)
 
+        # Obtener ID del usuario estudiante (por si cambia)
+        cur.execute("SELECT id FROM users WHERE email = 'juan.perez@utc.edu.mx'")
+        student_id = cur.fetchone()[0]
+
         sample_complaint = """
             INSERT INTO complaints (
-                user_id, complaint_type, category, priority, 
+                user_id, complaint_type, category,  
                 subject, description, incident_date, status
             ) 
             VALUES (
-                2, 
+                ?, 
                 'queja', 
                 'servicios-academicos', 
-                'alta', 
                 'Problema con inscripción a materias optativas', 
                 'No he podido inscribirme a las materias optativas del semestre debido a problemas técnicos en el sistema. He intentado varias veces pero siempre me aparece un error.',
                 '2025-07-20',
                 'pendiente'
             );
         """
-        
-        cur.execute(sample_complaint)
+
+        cur.execute(sample_complaint, (student_id,))
         conn.commit()
+        print("✅ Datos de prueba insertados correctamente")
     except mariadb.Error as e:
-        print(f"Error inserting data: {e}")
+        print(f"❌ Error inserting data: {e}")
+
+
 
 def initDB():
     init_users()
